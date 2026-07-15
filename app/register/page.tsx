@@ -28,7 +28,7 @@ export default function RegisterPage() {
   const [customerType, setCustomerType] = useState("");
   const [municipalities, setMunicipalities] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-
+const [logo, setLogo] = useState<File | null>(null);
   function handleMunicipalityChange(value: string) {
     setMunicipalities((current) => {
       if (current.includes(value)) {
@@ -48,38 +48,94 @@ export default function RegisterPage() {
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (municipalities.length === 0) {
-      alert("Selecciona por lo menos un municipio.");
-      return;
-    }
-
-    setSubmitting(true);
-
-    const { error } = await supabase
-      .from("business_registrations")
-      .insert({
-        business_name: businessName,
-        owner_name: ownerName,
-        phone,
-        email,
-        service,
-        customer_type: customerType,
-        municipality: municipalities,
-        description,
-      });
-
-    setSubmitting(false);
-
-    if (error) {
-      console.error("Error al registrar el negocio:", error);
-      alert("No se pudo enviar el registro. Inténtalo nuevamente.");
-      return;
-    }
-
-    setSubmitted(true);
+  if (municipalities.length === 0) {
+    alert("Selecciona por lo menos un municipio.");
+    return;
   }
+
+  if (!logo) {
+    alert("Selecciona un logo para el negocio.");
+    return;
+  }
+
+  if (logo.size > 2 * 1024 * 1024) {
+    alert("El logo no puede pesar más de 2 MB.");
+    return;
+  }
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
+
+  if (!allowedTypes.includes(logo.type)) {
+    alert("El logo debe ser JPG, PNG o WEBP.");
+    return;
+  }
+
+  setSubmitting(true);
+
+  const fileExtension = logo.name.split(".").pop();
+  const safeBusinessName = businessName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  const filePath = `${Date.now()}-${safeBusinessName}.${fileExtension}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("business-logos")
+    .upload(filePath, logo, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: logo.type,
+    });
+
+  if (uploadError) {
+    console.error("Error al subir el logo:", uploadError);
+    alert("No se pudo subir el logo.");
+    setSubmitting(false);
+    return;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("business-logos")
+    .getPublicUrl(filePath);
+
+  const logoUrl = publicUrlData.publicUrl;
+
+  const { error: registrationError } = await supabase
+    .from("business_registrations")
+    .insert({
+      business_name: businessName,
+      owner_name: ownerName,
+      phone,
+      email,
+      service,
+      customer_type: customerType,
+      municipality: municipalities,
+      description,
+      logo_url: logoUrl,
+    });
+
+  setSubmitting(false);
+
+  if (registrationError) {
+    console.error(
+      "Error al registrar el negocio:",
+      registrationError
+    );
+
+    alert("No se pudo guardar el registro.");
+    return;
+  }
+
+  setSubmitted(true);
+}
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -232,6 +288,23 @@ export default function RegisterPage() {
               )}
             </fieldset>
 
+<div>
+  <label className="mb-2 block font-semibold text-gray-700">
+    Logo del negocio
+  </label>
+
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    onChange={(e) => setLogo(e.target.files?.[0] ?? null)}
+    className="w-full rounded border p-3"
+    required
+  />
+
+  <p className="mt-2 text-sm text-gray-500">
+    Formatos permitidos: JPG, PNG o WEBP. Máximo 2 MB.
+  </p>
+</div>
             <textarea
               className="w-full rounded border p-3"
               placeholder="Describe tus servicios, experiencia y zonas de cobertura"
