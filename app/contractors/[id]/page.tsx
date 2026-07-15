@@ -23,7 +23,13 @@ type PortfolioItem = {
   title: string | null;
   description: string | null;
 };
-
+type Review = {
+  id: number;
+  created_at: string;
+  customer_name: string;
+  rating: number;
+  review_text: string;
+};
 export default async function ContractorProfile({ params }: Props) {
   const { id } = await params;
 
@@ -108,7 +114,32 @@ if (portfolioError) {
 
 const portfolioItems =
   (portfolioData ?? []) as PortfolioItem[];
+const { data: reviewData, error: reviewError } =
+  await supabase
+    .from("business_reviews")
+    .select(
+      "id, created_at, customer_name, rating, review_text"
+    )
+    .eq("business_id", business.id)
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
 
+if (reviewError) {
+  console.error(
+    "No se pudieron cargar las reseñas:",
+    reviewError
+  );
+}
+
+const reviews = (reviewData ?? []) as Review[];
+
+const averageRating =
+  reviews.length > 0
+    ? reviews.reduce(
+        (total, review) => total + review.rating,
+        0
+      ) / reviews.length
+    : 0;
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="mx-auto max-w-3xl rounded-xl bg-white p-8 shadow">
@@ -129,9 +160,13 @@ const portfolioItems =
         </h1>
 <div className="mt-4 flex flex-wrap items-center gap-3">
 
-  <div className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-700 font-semibold">
-    ⭐ Sin reseñas todavía
-  </div>
+  <div className="rounded-full bg-yellow-100 px-3 py-1 font-semibold text-yellow-700">
+  {reviews.length > 0
+    ? `⭐ ${averageRating.toFixed(1)} (${reviews.length} ${
+        reviews.length === 1 ? "reseña" : "reseñas"
+      })`
+    : "⭐ Sin reseñas todavía"}
+</div>
 
   {business.verified ? (
   <div className="rounded-full bg-green-100 px-3 py-1 font-semibold text-green-700">
@@ -200,6 +235,63 @@ const portfolioItems =
   <PortfolioGallery items={portfolioItems} />
 )}
 
+</section>
+<section className="mt-10 border-t pt-8">
+  <div className="flex items-center justify-between gap-4">
+    <div>
+      <h2 className="text-3xl font-bold">
+        Reseñas de clientes
+      </h2>
+
+      <p className="mt-2 text-gray-600">
+        Opiniones publicadas por clientes.
+      </p>
+    </div>
+
+    <span className="rounded-full bg-yellow-100 px-3 py-1 font-semibold text-yellow-700">
+      {reviews.length > 0
+        ? `⭐ ${averageRating.toFixed(1)}`
+        : "Sin reseñas"}
+    </span>
+  </div>
+
+  {reviews.length === 0 ? (
+    <div className="mt-6 rounded-xl bg-gray-50 p-6 text-gray-600">
+      Este profesional todavía no tiene reseñas.
+    </div>
+  ) : (
+    <div className="mt-6 space-y-5">
+      {reviews.map((review) => (
+        <article
+          key={review.id}
+          className="rounded-xl border bg-white p-6 shadow-sm"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-lg font-bold">
+              {review.customer_name}
+            </h3>
+
+            <p className="font-semibold text-yellow-500">
+              {"★".repeat(review.rating)}
+              <span className="text-gray-300">
+                {"★".repeat(5 - review.rating)}
+              </span>
+            </p>
+          </div>
+
+          <p className="mt-4 text-gray-700">
+            {review.review_text}
+          </p>
+
+          <p className="mt-4 text-sm text-gray-500">
+            {new Date(review.created_at).toLocaleDateString(
+              "es-MX"
+            )}
+          </p>
+        </article>
+      ))}
+    </div>
+  )}
 </section>
 <div className="mt-8 flex flex-wrap gap-3">
           <a
