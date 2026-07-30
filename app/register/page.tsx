@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const municipalityOptions = [
@@ -17,6 +18,11 @@ const municipalityOptions = [
 ];
 
 export default function RegisterPage() {
+    const router = useRouter();
+
+  const [checkingAccount, setCheckingAccount] =
+    useState(true);
+
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,6 +35,48 @@ export default function RegisterPage() {
   const [municipalities, setMunicipalities] = useState<string[]>([]);
   const [description, setDescription] = useState("");
 const [logo, setLogo] = useState<File | null>(null);
+
+  useEffect(() => {
+    async function protectRegistrationPage() {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error(
+          "Error al verificar la sesión:",
+          error
+        );
+
+        router.push("/businesses/login");
+        return;
+      }
+
+      if (!session) {
+        router.push("/businesses/login");
+        return;
+      }
+
+      const accountType =
+        session.user.user_metadata?.account_type;
+
+      if (accountType === "customer") {
+        router.push("/customer/dashboard");
+        return;
+      }
+
+      if (accountType !== "business") {
+        router.push("/businesses/login");
+        return;
+      }
+
+      setCheckingAccount(false);
+    }
+
+    protectRegistrationPage();
+  }, [router]);
+
   function handleMunicipalityChange(value: string) {
     setMunicipalities((current) => {
       if (current.includes(value)) {
@@ -49,6 +97,38 @@ const [logo, setLogo] = useState<File | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
+
+    const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    console.error(
+      "Error al verificar la sesión:",
+      sessionError
+    );
+
+    alert("No se pudo verificar tu cuenta.");
+    return;
+  }
+
+  if (!session) {
+    alert(
+      "Debes iniciar sesión con una cuenta de empresa antes de registrar tu negocio."
+    );
+    return;
+  }
+
+  const accountType =
+    session.user.user_metadata?.account_type;
+
+  if (accountType !== "business") {
+    alert(
+      "Debes usar una cuenta de empresa para registrar un negocio."
+    );
+    return;
+  }
 
   if (municipalities.length === 0) {
     alert("Selecciona por lo menos un municipio.");
@@ -119,6 +199,7 @@ const [logo, setLogo] = useState<File | null>(null);
       customer_type: customerType,
       municipality: municipalities,
       description,
+      owner_user_id: session.user.id,
       logo_url: logoUrl,
     });
 
@@ -136,6 +217,16 @@ const [logo, setLogo] = useState<File | null>(null);
 
   setSubmitted(true);
 }
+
+  if (checkingAccount) {
+    return (
+      <main className="min-h-screen bg-gray-100 p-8">
+        <p className="text-gray-600">
+          Verificando cuenta...
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">

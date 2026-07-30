@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import PortfolioGallery from "@/components/PortfolioGallery";
+import { formatService } from "@/lib/formatService";
+
 type Props = {
   params: Promise<{
     id: string;
@@ -68,7 +70,7 @@ export default async function ContractorProfile({ params }: Props) {
   verified
 `)
     .eq("id", businessId)
-    .eq("status", "approved")
+    .eq("approval_status", "approved")
     .single();
 
   const business = data as Business | null;
@@ -97,7 +99,19 @@ if (error || !business) {
     </main>
   );
 }
+const { error: viewError } = await supabase.rpc(
+  "increment_business_profile_view",
+  {
+    requested_business_id: business.id,
+  }
+);
 
+if (viewError) {
+  console.error(
+    "No se pudo registrar la visita:",
+    viewError
+  );
+}
 const { data: portfolioData, error: portfolioError } =
   await supabase
     .from("business_portfolio")
@@ -143,49 +157,118 @@ const averageRating =
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="mx-auto max-w-3xl rounded-xl bg-white p-8 shadow">
-        {business.logo_url ? (
-          <img
-            src={business.logo_url}
-            alt={`Logo de ${business.business_name}`}
-            className="h-56 w-full rounded-xl object-contain"
-          />
-        ) : (
-          <div className="flex h-56 items-center justify-center rounded-xl bg-blue-50 text-7xl">
-            🛠️
-          </div>
-        )}
+        <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 p-10 text-center text-white">
 
-        <h1 className="mt-6 text-4xl font-bold text-blue-700">
-          {business.business_name}
-        </h1>
-<div className="mt-4 flex flex-wrap items-center gap-3">
+  {business.logo_url ? (
+    <img
+      src={business.logo_url}
+      alt={`Logo de ${business.business_name}`}
+      className="mx-auto h-36 w-36 rounded-full border-4 border-white bg-white object-contain shadow-lg"
+    />
+  ) : (
+    <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-white text-7xl shadow-lg">
+      🛠️
+    </div>
+  )}
 
-  <div className="rounded-full bg-yellow-100 px-3 py-1 font-semibold text-yellow-700">
-  {reviews.length > 0
-    ? `⭐ ${averageRating.toFixed(1)} (${reviews.length} ${
-        reviews.length === 1 ? "reseña" : "reseñas"
-      })`
-    : "⭐ Sin reseñas todavía"}
-</div>
+  <h1 className="mt-6 text-4xl font-extrabold">
+    {business.business_name}
+  </h1>
 
-  {business.verified ? (
-  <div className="rounded-full bg-green-100 px-3 py-1 font-semibold text-green-700">
-    ✓ Empresa verificada
-  </div>
-) : (
-  <div className="rounded-full bg-yellow-100 px-3 py-1 font-semibold text-yellow-700">
-    ⏳ Empresa pendiente de verificación
-  </div>
-)}
+  <div className="mt-4 flex flex-wrap justify-center gap-3">
+
+    <span className="rounded-full bg-yellow-400 px-4 py-2 font-bold text-black">
+      {reviews.length > 0
+        ? `⭐ ${averageRating.toFixed(1)} (${reviews.length})`
+        : "⭐ Sin reseñas"}
+    </span>
+
+    <span className="rounded-full bg-green-500 px-4 py-2 font-bold text-white">
+  ✔ Profesional aprobado
+</span>
 
 </div>
-        <p className="mt-4 text-xl text-gray-700">
-          🔧 {business.service}
-        </p>
 
-        <p className="mt-2 text-gray-700">
-          🏠🏢 {business.customer_type}
-        </p>
+<div className="mt-8 flex flex-wrap justify-center gap-4">
+  <a
+    href={`tel:${business.phone}`}
+    className="rounded-xl bg-gray-800 px-8 py-3 font-bold text-white transition hover:bg-gray-900"
+  >
+    📞 Llamar
+  </a>
+
+  <a
+    href={`https://wa.me/52${business.phone.replace(/\D/g, "")}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="rounded-xl bg-green-500 px-8 py-3 font-bold text-white transition hover:bg-green-600"
+  >
+    💬 WhatsApp
+  </a>
+
+  <a
+    href={`/quote?business=${business.id}`}
+    className="rounded-xl bg-white px-8 py-3 font-bold text-blue-700 transition hover:bg-gray-100"
+  >
+    📝 Solicitar servicio
+  </a>
+</div>
+
+</div>
+
+<div className="mt-6 grid gap-4 rounded-xl border bg-gray-50 p-6 sm:grid-cols-2">
+  <div>
+    <p className="text-sm text-gray-500">
+      Servicio principal
+    </p>
+
+    <p className="text-lg font-bold">
+  🔧 {formatService(business.service)}
+</p>
+  </div>
+
+  <div>
+    <p className="text-sm text-gray-500">
+  Tipo de cliente
+</p>
+
+<p className="text-lg font-bold">
+  {business.customer_type === "ambos"
+    ? "🏠 Hogares y 🏢 Negocios"
+    : business.customer_type === "hogares"
+    ? "🏠 Hogares"
+    : business.customer_type === "negocios"
+    ? "🏢 Negocios"
+    : business.customer_type}
+</p>
+    
+  </div>
+
+  <div>
+    <p className="text-sm text-gray-500">
+      Municipios
+    </p>
+
+    <p className="font-bold">
+      {business.municipality.join(", ")}
+    </p>
+  </div>
+
+<div>
+  <p className="text-sm text-gray-500">
+    Calificación
+  </p>
+
+  <p className="text-lg font-bold text-yellow-600">
+    {reviews.length > 0
+  ? `⭐ ${averageRating.toFixed(1)} • ${reviews.length} ${
+      reviews.length === 1 ? "reseña" : "reseñas"
+    }`
+  : "⭐ Sin reseñas"}
+  </p>
+</div>
+
+</div>
 
         <h2 className="mt-8 text-2xl font-bold">
           Municipios donde presta servicio
@@ -206,7 +289,10 @@ const averageRating =
         <p className="mt-3 text-gray-700">
           {business.description}
         </p>
-<section className="mt-10 border-t pt-8">
+<section
+  id="portfolio"
+  className="mt-10 border-t pt-8"
+>
 
   <div className="flex items-center justify-between">
     <div>
@@ -215,19 +301,22 @@ const averageRating =
       </h2>
 
       <p className="mt-2 text-gray-600">
-        Algunos proyectos publicados por este profesional.
+        Explora algunos de los proyectos realizados por este profesional.
       </p>
     </div>
 
-    <span className="rounded-full bg-blue-100 px-3 py-1 font-semibold text-blue-700">
-      {portfolioItems.length}
-    </span>
+    <span className="rounded-full bg-blue-100 px-4 py-2 font-semibold text-blue-700">
+  📷 {portfolioItems.length}{" "}
+  {portfolioItems.length === 1
+    ? "proyecto"
+    : "proyectos"}
+</span>
   </div>
 
   {portfolioItems.length === 0 ? (
 
     <div className="mt-6 rounded-xl bg-gray-50 p-6 text-center text-gray-500">
-      Este profesional todavía no ha publicado trabajos.
+      Este profesional aún no ha publicado proyectos. Vuelve pronto para ver sus trabajos.
     </div>
 
   
@@ -293,21 +382,6 @@ const averageRating =
     </div>
   )}
 </section>
-<div className="mt-8 flex flex-wrap gap-3">
-          <a
-            href={`tel:${business.phone}`}
-            className="rounded bg-green-600 px-6 py-3 text-white hover:bg-green-700"
-          >
-            📞 Llamar
-          </a>
-
-          <a
-            href={`/quote?business=${business.id}`}
-            className="rounded bg-blue-700 px-6 py-3 text-white hover:bg-blue-800"
-          >
-            Solicitar cotización
-          </a>
-        </div>
       </div>
     </main>
   );

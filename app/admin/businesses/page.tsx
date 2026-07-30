@@ -12,7 +12,7 @@ type Business = {
   municipality: string[];
   description: string;
   logo_url: string | null;
-  status: string;
+  approval_status: "pending" | "approved" | "rejected";
 };
 
 export default function AdminBusinessesPage() {
@@ -54,16 +54,20 @@ async function updateBusinessStatus(
 ) {
   const { data, error } = await supabase
     .from("business_registrations")
-    .update({ status })
+    .update({
+      approval_status: status,
+    })
     .eq("id", id)
-    .select("id, status")
+    .select("id, approval_status")
     .single();
 
   if (error) {
     console.error(
-  "Error al actualizar el negocio:",
-  JSON.stringify(error, null, 2)
-);
+      "Error al actualizar el negocio:",
+      JSON.stringify(error, null, 2)
+    );
+
+    alert("No se pudo actualizar el negocio.");
     return;
   }
 
@@ -75,10 +79,14 @@ async function updateBusinessStatus(
   setBusinesses((current) =>
     current.map((business) =>
       business.id === id
-        ? { ...business, status: data.status }
+        ? {
+            ...business,
+            approval_status: data.approval_status,
+          }
         : business
     )
   );
+  
 }
 async function handleLogout() {
   await supabase.auth.signOut();
@@ -90,7 +98,7 @@ const filteredBusinesses = businesses.filter((business) => {
     return true;
   }
 
-  return business.status === statusFilter;
+  return business.approval_status === statusFilter;
 });
   if (loading) {
     return (
@@ -176,15 +184,15 @@ const filteredBusinesses = businesses.filter((business) => {
                   </p>
 
                   <p className="mt-3 text-sm text-blue-700">
-                    Estado: {business.status}
-                  </p>
+  Estado: {business.approval_status}
+</p>
 <div className="mt-5 flex flex-wrap gap-3">
   <button
     type="button"
     onClick={() =>
       updateBusinessStatus(business.id, "approved")
     }
-    disabled={business.status === "approved"}
+    disabled={business.approval_status === "approved"}
     className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
   >
     Aprobar
@@ -195,13 +203,13 @@ const filteredBusinesses = businesses.filter((business) => {
     onClick={() =>
       updateBusinessStatus(business.id, "rejected")
     }
-    disabled={business.status === "rejected"}
+    disabled={business.approval_status === "rejected"}
     className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
   >
     Rechazar
   </button>
 
-  {business.status === "approved" && (
+  {business.approval_status === "approved" && (
   <a
     href={`/contractors/${business.id}`}
     className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800"

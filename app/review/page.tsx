@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -15,7 +19,7 @@ type QuoteRequest = {
   email: string;
   status: string;
 };
-export default function ReviewPage() {
+function ReviewContent() {
   const searchParams = useSearchParams();
 
 
@@ -287,5 +291,18 @@ if (!business) {
         )}
       </div>
     </main>
+  );
+}
+export default function ReviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-gray-100 p-8">
+          <p>Cargando reseña...</p>
+        </main>
+      }
+    >
+      <ReviewContent />
+    </Suspense>
   );
 }
