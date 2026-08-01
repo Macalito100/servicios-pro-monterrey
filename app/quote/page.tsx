@@ -211,15 +211,15 @@ is_read: false,
 }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
 
-      <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8">
+      <div className="mx-auto max-w-xl rounded-xl bg-white p-5 shadow sm:p-8">
 
-        <h1 className="text-4xl font-bold text-blue-700">
+        <h1 className="text-3xl font-bold leading-tight text-blue-700 sm:text-4xl">
   Solicitar cotización
 </h1>
 
-<p className="mt-3 text-gray-600">
+<p className="mt-3 text-sm leading-relaxed text-gray-600 sm:text-base">
   Completa el formulario y el profesional recibirá tu solicitud directamente.
 </p>
 
@@ -270,22 +270,23 @@ is_read: false,
 ) : (
   <form
     onSubmit={handleSubmit}
-    className="mt-8 space-y-4"
+    className="mt-6 space-y-4 sm:mt-8"
   >
     <div>
   <label className="mb-3 block font-semibold text-gray-700">
     ¿Qué necesitas?
   </label>
 
-  <div className="space-y-3 rounded-lg border p-4">
+  <div className="space-y-2 rounded-lg border p-3 sm:p-4">
 
-    <label className="flex items-center gap-3 cursor-pointer">
+    <label className="flex cursor-pointer items-start gap-3 rounded-lg p-2">
       <input
         type="radio"
         name="requestType"
         value="quote"
         checked={requestType === "quote"}
         onChange={() => setRequestType("quote")}
+        className="mt-1 h-5 w-5 shrink-0"
       />
 
       <div>
@@ -299,13 +300,14 @@ is_read: false,
       </div>
     </label>
 
-    <label className="flex items-center gap-3 cursor-pointer">
+    <label className="flex cursor-pointer items-start gap-3 rounded-lg p-2">
       <input
         type="radio"
         name="requestType"
         value="visit"
         checked={requestType === "visit"}
         onChange={() => setRequestType("visit")}
+        className="mt-1 h-5 w-5 shrink-0"
       />
 
       <div>
@@ -373,25 +375,25 @@ is_read: false,
     Cargando información del negocio...
   </div>
 ) : selectedBusiness ? (
-  <div className="mb-8 rounded-xl border bg-blue-50 p-6">
+  <div className="mb-6 rounded-xl border bg-blue-50 p-4 sm:mb-8 sm:p-6">
     <p className="text-center text-sm font-semibold uppercase tracking-wide text-blue-700">
       Solicitando cotización para
     </p>
 
-    <div className="mt-6 flex flex-col items-center text-center">
+    <div className="mt-4 flex min-w-0 flex-col items-center text-center sm:mt-6">
       {selectedBusiness.logo_url ? (
         <img
           src={selectedBusiness.logo_url}
           alt={`Logo de ${selectedBusiness.business_name}`}
-          className="h-32 w-32 rounded-xl bg-white p-3 object-contain shadow"
+          className="h-24 w-24 rounded-xl bg-white p-2 object-contain shadow sm:h-32 sm:w-32 sm:p-3"
         />
       ) : (
-        <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white text-6xl shadow">
+        <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-white text-5xl shadow sm:h-32 sm:w-32 sm:text-6xl">
           🛠️
         </div>
       )}
 
-      <h2 className="mt-6 text-4xl font-bold text-gray-900">
+      <h2 className="mt-4 max-w-full break-words text-2xl font-bold leading-tight text-gray-900 sm:mt-6 sm:text-4xl">
   {selectedBusiness.business_name}
 </h2>
 
@@ -407,11 +409,11 @@ is_read: false,
 )}
 </div>
 
-<p className="mt-4 text-xl text-gray-700">
+<p className="mt-4 text-base text-gray-700 sm:text-xl">
   🔧 {selectedBusiness.service}
 </p>
 
-      <p className="mt-2 text-gray-600">
+      <p className="mt-2 max-w-full break-words text-sm leading-relaxed text-gray-600 sm:text-base">
         📍 {selectedBusiness.municipality.join(" • ")}
       </p>
     </div>
@@ -468,7 +470,7 @@ is_read: false,
     onChange={(event) =>
       setPhotos(Array.from(event.target.files ?? []))
     }
-    className="mt-2 block w-full rounded-lg border border-gray-300 bg-white p-3"
+    className="mt-2 block w-full rounded-lg border border-gray-300 bg-white p-3 text-sm"
   />
 
   <p className="mt-2 text-sm text-gray-500">
@@ -495,7 +497,7 @@ is_read: false,
   )}
 </div>
 {requestType === "visit" && (
-  <div className="space-y-4 rounded-xl border border-blue-200 bg-blue-50 p-5">
+  <div className="space-y-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
     <div>
       <h3 className="text-lg font-bold text-blue-800">
         Información para la visita
@@ -574,7 +576,7 @@ is_read: false,
 
 <button
   type="submit"
-  className="w-full rounded bg-blue-700 p-3 font-bold text-white transition hover:bg-blue-800"
+  className="min-h-12 w-full rounded-xl bg-blue-700 px-4 py-3 font-bold text-white transition hover:bg-blue-800"
 >
   {requestType === "visit"
     ? "Solicitar visita"
@@ -595,7 +597,7 @@ export default function QuotePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-gray-100 p-8">
+        <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
           <p>Cargando formulario...</p>
         </main>
       }

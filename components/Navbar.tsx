@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [accountType, setAccountType] =
@@ -17,7 +21,13 @@ export default function Navbar() {
 
   const [accountMenuOpen, setAccountMenuOpen] =
     useState(false);
-
+const [mobileMenuOpen, setMobileMenuOpen] =
+  useState(false);
+useEffect(() => {
+  setMobileMenuOpen(false);
+  setAccessMenuOpen(false);
+  setAccountMenuOpen(false);
+}, [pathname]);
   useEffect(() => {
     async function loadUser() {
   const {
@@ -95,15 +105,29 @@ export default function Navbar() {
 
   return (
     <nav className="relative z-50 bg-white shadow">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
         <Link
           href="/"
-          className="max-w-64 text-xl font-bold leading-tight text-blue-700"
+          className="max-w-[13rem] text-lg font-bold leading-tight text-blue-700 sm:max-w-64 sm:text-xl"
         >
           Servicios Pro Monterrey México
         </Link>
-
-        <div className="flex flex-wrap items-center justify-end gap-3">
+<button
+  type="button"
+  onClick={() =>
+    setMobileMenuOpen((current) => !current)
+  }
+  aria-label="Abrir menú"
+  aria-expanded={mobileMenuOpen}
+  className="flex h-11 w-11 items-center justify-center rounded-lg border border-gray-300 text-2xl text-gray-700 md:hidden"
+>
+  {mobileMenuOpen ? "✕" : "☰"}
+</button>
+        <div
+  className={`${
+    mobileMenuOpen ? "flex" : "hidden"
+  } order-3 w-full flex-col gap-2 border-t border-gray-100 pt-3 md:order-none md:flex md:w-auto md:flex-row md:items-center md:justify-end md:gap-3 md:border-0 md:pt-0`}
+>
           <Link
             href="/"
             className="whitespace-nowrap rounded px-3 py-2 font-medium text-gray-700 hover:bg-gray-100"
@@ -135,19 +159,19 @@ export default function Navbar() {
           )}
 
           {!loggedIn && (
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 type="button"
                 onClick={() =>
                   setAccessMenuOpen((current) => !current)
                 }
-                className="rounded border border-blue-700 px-4 py-2 font-semibold text-blue-700 hover:bg-blue-50"
+                className="w-full rounded border border-blue-700 px-4 py-3 font-semibold text-blue-700 hover:bg-blue-50 md:w-auto md:py-2"
               >
                 Acceder ▾
               </button>
 
               {accessMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div className="mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl md:absolute md:right-0 md:top-full md:w-72">
                   <div className="border-b border-gray-100 p-4">
                     <p className="font-bold text-gray-900">
                       👤 Cliente
@@ -211,19 +235,19 @@ export default function Navbar() {
           )}
 
           {loggedIn && (
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <button
                 type="button"
                 onClick={() =>
                   setAccountMenuOpen((current) => !current)
                 }
-                className="rounded bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800"
+                className="w-full rounded bg-blue-700 px-4 py-3 font-semibold text-white hover:bg-blue-800 md:w-auto md:py-2"
               >
                 👤 Mi cuenta ▾
               </button>
 
               {accountMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div className="mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl md:absolute md:right-0 md:top-full md:w-60">
                   {accountType === "customer" && (
                     <>
                       <Link
@@ -287,7 +311,7 @@ export default function Navbar() {
           {accountType !== "business" && (
   <Link
     href="/quote"
-    className="whitespace-nowrap rounded bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+    className="block w-full whitespace-nowrap rounded bg-green-600 px-4 py-3 text-center font-semibold text-white hover:bg-green-700 md:w-auto md:py-2"
   >
     Cotizar
   </Link>

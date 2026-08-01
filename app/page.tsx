@@ -56,129 +56,119 @@ const [municipality, setMunicipality] = useState("");
     <main className="min-h-screen bg-gray-100">
 
       {/* Hero */}
-<header className="bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-20 text-white">
-
+<header className="bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-12 text-white sm:px-6 sm:py-16 md:py-20">
   <div className="mx-auto max-w-6xl">
-
-    <h1 className="text-center text-5xl font-extrabold leading-tight md:text-6xl">
+    <h1 className="text-center text-3xl font-extrabold leading-tight sm:text-4xl md:text-6xl">
       Encuentra profesionales confiables
-      <br />
+      <br className="hidden sm:block" />
       para tu hogar o negocio
     </h1>
 
-    <p className="mx-auto mt-6 max-w-3xl text-center text-xl text-blue-100">
-      Electricistas, plomeros, carpinteros, técnicos de aire acondicionado,
-      limpieza y muchos más en Monterrey y su área metropolitana.
+    <p className="mx-auto mt-4 max-w-3xl text-center text-base leading-relaxed text-blue-100 sm:mt-6 sm:text-lg md:text-xl">
+      Electricistas, plomeros, carpinteros, técnicos de aire
+      acondicionado, limpieza y muchos más en Monterrey y su área
+      metropolitana.
     </p>
 
-    <div className="mx-auto mt-10 max-w-4xl rounded-2xl bg-white p-6 shadow-2xl">
-
-      <div className="grid gap-4 md:grid-cols-3">
+    <div className="mx-auto mt-8 max-w-4xl rounded-2xl bg-white p-4 shadow-2xl sm:mt-10 sm:p-6">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+        <select
+          value={service}
+          onChange={(event) =>
+            setService(event.target.value)
+          }
+          className="w-full min-w-0 rounded-xl border p-4 text-base text-gray-800 outline-none focus:border-blue-600"
+        >
+          <option value="">
+            ¿Qué servicio necesitas?
+          </option>
+          <option value="electricidad">
+            ⚡ Electricidad
+          </option>
+          <option value="plomeria">
+            🚿 Plomería
+          </option>
+          <option value="aire-acondicionado">
+            ❄️ Aire acondicionado
+          </option>
+          <option value="limpieza">
+            🧹 Limpieza
+          </option>
+          <option value="pintura">
+            🎨 Pintura
+          </option>
+          <option value="carpinteria">
+            🪚 Carpintería
+          </option>
+          <option value="seguridad">
+            🔒 Seguridad
+          </option>
+          <option value="jardineria">
+            🌿 Jardinería
+          </option>
+          <option value="remodelacion">
+            🏠 Remodelación
+          </option>
+          <option value="mantenimiento">
+            🛠️ Mantenimiento general
+          </option>
+        </select>
 
         <select
-  value={service}
-  onChange={(e) => setService(e.target.value)}
-  className="rounded-xl border p-4 text-gray-800 outline-none focus:border-blue-600"
->
-  <option value="">¿Qué servicio necesitas?</option>
-
-  <option value="electricidad">
-    ⚡ Electricidad
-  </option>
-
-  <option value="plomeria">
-    🚿 Plomería
-  </option>
-
-  <option value="aire-acondicionado">
-    ❄️ Aire acondicionado
-  </option>
-
-  <option value="limpieza">
-    🧹 Limpieza
-  </option>
-
-  <option value="pintura">
-    🎨 Pintura
-  </option>
-
-  <option value="carpinteria">
-    🪚 Carpintería
-  </option>
-
-  <option value="seguridad">
-    🔒 Seguridad
-  </option>
-
-  <option value="jardineria">
-    🌿 Jardinería
-  </option>
-
-  <option value="remodelacion">
-    🏠 Remodelación
-  </option>
-
-  <option value="mantenimiento">
-    🛠️ Mantenimiento general
-  </option>
-</select>
-
-        <select
-  value={municipality}
-  onChange={(e) => setMunicipality(e.target.value)}
-  className="rounded-xl border p-4 text-gray-800 outline-none focus:border-blue-600"
->
-  <option value="">Selecciona un municipio</option>
-  <option>Monterrey</option>
-  <option>San Pedro</option>
-  <option>Guadalupe</option>
-  <option>Apodaca</option>
-  <option>San Nicolás</option>
-  <option>Escobedo</option>
-  <option>Santa Catarina</option>
-</select>
+          value={municipality}
+          onChange={(event) =>
+            setMunicipality(event.target.value)
+          }
+          className="w-full min-w-0 rounded-xl border p-4 text-base text-gray-800 outline-none focus:border-blue-600"
+        >
+          <option value="">
+            Selecciona un municipio
+          </option>
+          <option>Monterrey</option>
+          <option>San Pedro</option>
+          <option>Guadalupe</option>
+          <option>Apodaca</option>
+          <option>San Nicolás</option>
+          <option>Escobedo</option>
+          <option>Santa Catarina</option>
+        </select>
 
         <button
-  onClick={() => {
-    const params = new URLSearchParams();
+          type="button"
+          onClick={() => {
+            const params = new URLSearchParams();
 
-    if (service) {
-      params.set("service", service);
-    }
+            if (service) {
+              params.set("service", service);
+            }
 
-    if (municipality) {
-      params.set("municipality", municipality);
-    }
+            if (municipality) {
+              params.set("municipality", municipality);
+            }
 
-    router.push(`/contractors?${params.toString()}`);
-  }}
-  className="rounded-xl bg-blue-700 px-8 py-4 text-lg font-bold text-white transition hover:bg-blue-800"
->
-  🔍 Buscar
-</button>
-
+            router.push(
+              `/contractors?${params.toString()}`
+            );
+          }}
+          className="min-h-12 w-full rounded-xl bg-blue-700 px-6 py-4 text-lg font-bold text-white transition hover:bg-blue-800"
+        >
+          🔍 Buscar
+        </button>
       </div>
-
     </div>
 
-    <div className="mt-8 flex flex-wrap justify-center gap-4 text-lg">
-
+    <div className="mt-6 flex flex-col items-center gap-2 text-center text-sm sm:mt-8 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4 sm:text-base md:text-lg">
       <span>⭐⭐⭐⭐⭐ Profesionales aprobados</span>
-
       <span>📷 Portafolios reales</span>
-
       <span>📝 Reseñas verificadas</span>
-
     </div>
-
   </div>
-
 </header>
 
 {/* Popular Services */}
-<section className="mx-auto max-w-6xl px-6 py-14">
+<section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
 
-  <h2 className="text-center text-4xl font-bold">
+  <h2 className="text-center text-3xl font-bold sm:text-4xl">
     Servicios populares
   </h2>
 
@@ -186,45 +176,45 @@ const [municipality, setMunicipality] = useState("");
     Selecciona un servicio para ver profesionales disponibles.
   </p>
 
-  <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+  <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-6 lg:grid-cols-5">
 
     <a
       href="/contractors?service=electricidad"
-      className="rounded-2xl bg-white p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl"
+      className="min-w-0 rounded-2xl bg-white p-4 text-center shadow transition hover:-translate-y-1 hover:shadow-xl sm:p-6"
     >
-      <div className="text-5xl">⚡</div>
+      <div className="text-4xl sm:text-5xl">⚡</div>
       <h3 className="mt-4 font-bold">Electricidad</h3>
     </a>
 
     <a
       href="/contractors?service=plomeria"
-      className="rounded-2xl bg-white p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl"
+      className="min-w-0 rounded-2xl bg-white p-4 text-center shadow transition hover:-translate-y-1 hover:shadow-xl sm:p-6"
     >
-      <div className="text-5xl">🚿</div>
+      <div className="text-4xl sm:text-5xl">🚿</div>
       <h3 className="mt-4 font-bold">Plomería</h3>
     </a>
 
     <a
       href="/contractors?service=aire-acondicionado"
-      className="rounded-2xl bg-white p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl"
+      className="min-w-0 rounded-2xl bg-white p-4 text-center shadow transition hover:-translate-y-1 hover:shadow-xl sm:p-6"
     >
-      <div className="text-5xl">❄️</div>
+      <div className="text-4xl sm:text-5xl">❄️</div>
       <h3 className="mt-4 font-bold">Aire acondicionado</h3>
     </a>
 
     <a
       href="/contractors?service=carpinteria"
-      className="rounded-2xl bg-white p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl"
+      className="min-w-0 rounded-2xl bg-white p-4 text-center shadow transition hover:-translate-y-1 hover:shadow-xl sm:p-6"
     >
-      <div className="text-5xl">🪚</div>
+      <div className="text-4xl sm:text-5xl">🪚</div>
       <h3 className="mt-4 font-bold">Carpintería</h3>
     </a>
 
     <a
       href="/contractors?service=limpieza"
-      className="rounded-2xl bg-white p-6 text-center shadow transition hover:-translate-y-1 hover:shadow-xl"
+      className="min-w-0 rounded-2xl bg-white p-4 text-center shadow transition hover:-translate-y-1 hover:shadow-xl sm:p-6"
     >
-      <div className="text-5xl">🧹</div>
+      <div className="text-4xl sm:text-5xl">🧹</div>
       <h3 className="mt-4 font-bold">Limpieza</h3>
     </a>
 
@@ -239,14 +229,14 @@ const [municipality, setMunicipality] = useState("");
 </div>
 
 {/* Services */}
-<section className="p-8 max-w-6xl mx-auto">
+<section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
 
-        <h2 className="text-3xl font-bold mb-8 text-center">
+        <h2 className="mb-6 text-center text-3xl font-bold sm:mb-8">
           Servicios Profesionales
         </h2>
 
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
 
           {services.map((service) => (
   <button
@@ -255,7 +245,7 @@ const [municipality, setMunicipality] = useState("");
     onClick={() =>
       router.push(`/contractors?service=${service.value}`)
     }
-    className="w-full cursor-pointer rounded-xl bg-white p-6 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+    className="w-full cursor-pointer rounded-xl bg-white p-5 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg sm:p-6"
   >
     <div className="text-3xl">{service.icon}</div>
 
@@ -279,25 +269,25 @@ const [municipality, setMunicipality] = useState("");
 
 
       {/* How It Works */}
-<section className="bg-white py-20">
+<section className="bg-white py-12 sm:py-16 md:py-20">
 
-  <div className="mx-auto max-w-6xl px-6">
+  <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
-    <h2 className="text-center text-4xl font-bold">
+    <h2 className="text-center text-3xl font-bold sm:text-4xl">
       ¿Cómo funciona?
     </h2>
 
-    <p className="mt-4 text-center text-lg text-gray-600">
+    <p className="mt-3 text-center text-base text-gray-600 sm:mt-4 sm:text-lg">
       Encontrar un profesional confiable nunca había sido tan fácil.
     </p>
 
-    <div className="mt-16 grid gap-10 md:grid-cols-3">
+    <div className="mt-8 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-3 md:mt-16">
 
-      <div className="rounded-2xl border bg-gray-50 p-8 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="rounded-2xl border bg-gray-50 p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:p-8">
 
-        <div className="text-6xl">🔍</div>
+        <div className="text-5xl sm:text-6xl">🔍</div>
 
-        <h3 className="mt-6 text-2xl font-bold">
+        <h3 className="mt-4 text-xl font-bold sm:mt-6 sm:text-2xl">
           1. Busca
         </h3>
 
@@ -307,11 +297,11 @@ const [municipality, setMunicipality] = useState("");
 
       </div>
 
-      <div className="rounded-2xl border bg-gray-50 p-8 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="rounded-2xl border bg-gray-50 p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:p-8">
 
-        <div className="text-6xl">📝</div>
+        <div className="text-5xl sm:text-6xl">📝</div>
 
-        <h3 className="mt-6 text-2xl font-bold">
+        <h3 className="mt-4 text-xl font-bold sm:mt-6 sm:text-2xl">
           2. Solicita un servicio
         </h3>
 
@@ -321,11 +311,11 @@ const [municipality, setMunicipality] = useState("");
 
       </div>
 
-      <div className="rounded-2xl border bg-gray-50 p-8 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="rounded-2xl border bg-gray-50 p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:p-8">
 
-        <div className="text-6xl">🤝</div>
+        <div className="text-5xl sm:text-6xl">🤝</div>
 
-        <h3 className="mt-6 text-2xl font-bold">
+        <h3 className="mt-4 text-xl font-bold sm:mt-6 sm:text-2xl">
           3. Contrata
         </h3>
 
@@ -343,24 +333,24 @@ const [municipality, setMunicipality] = useState("");
 
 
       {/* Footer CTA */}
-      <footer className="bg-blue-700 text-white py-16 px-6 text-center">
+    <footer className="bg-blue-700 px-4 py-12 text-center text-white sm:px-6 sm:py-16">
 
-  <h2 className="text-4xl font-extrabold">
+  <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">
     ¿Necesitas un servicio para tu hogar o negocio?
   </h2>
 
-  <p className="mt-4 text-xl text-blue-100">
+  <p className="mt-4 text-base text-blue-100 sm:text-xl">
     Solicita una cotización con profesionales de Monterrey.
   </p>
 
   <button
     onClick={() => router.push("/quote")}
-    className="mt-8 rounded-xl bg-white px-10 py-5 text-xl font-bold text-blue-700 shadow-lg transition hover:scale-105 hover:bg-gray-100"
+    className="mt-7 w-full max-w-sm rounded-xl bg-white px-4 py-4 text-lg font-bold text-blue-700 shadow-lg transition hover:scale-105 hover:bg-gray-100 sm:mt-8 sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
   >
     📝 Solicitar una cotización gratis
   </button>
 
-  <p className="mt-6 text-lg text-blue-100">
+  <p className="mt-6 text-sm leading-relaxed text-blue-100 sm:text-lg">
     ✅ Sin costo • ✅ Sin compromiso • ✅ Profesionales verificados
   </p>
 

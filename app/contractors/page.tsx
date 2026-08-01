@@ -451,13 +451,13 @@ const paginatedBusinesses = sortedBusinesses.slice(
   startIndex + businessesPerPage
 );
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="text-4xl font-bold text-blue-700">
+        <h1 className="text-3xl font-bold leading-tight text-blue-700 sm:text-4xl">
           Profesionales en Monterrey
         </h1>
 
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-sm text-gray-600 sm:text-base">
           Encuentra servicios para hogares y negocios.
         </p>
 
@@ -469,9 +469,9 @@ const paginatedBusinesses = sortedBusinesses.slice(
   setSearch(e.target.value);
   setCurrentPage(1);
 }}
-          className="mt-6 w-full rounded-lg border bg-white p-3"
+          className="mt-5 w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-900 sm:mt-6"
         />
-<div className="mt-4 grid gap-4 rounded-xl bg-white p-5 shadow sm:grid-cols-2 lg:grid-cols-4">
+<div className="mt-4 grid gap-3 rounded-xl bg-white p-4 shadow sm:grid-cols-2 sm:gap-4 sm:p-5 lg:grid-cols-4">
   <select
   value={serviceFilter}
   onChange={(e) => {
@@ -524,9 +524,10 @@ const paginatedBusinesses = sortedBusinesses.slice(
     <option value="Santiago">Santiago</option>
   </select>
 
-  <label className="flex items-center gap-2 rounded border p-3">
+  <label className="flex min-h-12 items-center gap-3 rounded border p-3">
     <input
   type="checkbox"
+  className="h-5 w-5 shrink-0"
   checked={verifiedOnly}
   onChange={(e) => {
     setVerifiedOnly(e.target.checked);
@@ -537,10 +538,11 @@ const paginatedBusinesses = sortedBusinesses.slice(
     Solo verificados
   </label>
 
-  <label className="flex items-center gap-2 rounded border p-3">
+  <label className="flex min-h-12 items-center gap-3 rounded border p-3">
     
 <input
   type="checkbox"
+  className="h-5 w-5 shrink-0"
   checked={portfolioOnly}
   onChange={(e) => {
     setPortfolioOnly(e.target.checked);
@@ -565,7 +567,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
   Limpiar filtros
 </button>
 </div>
-<div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+<div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
   <p className="font-semibold text-gray-700">
     {sortedBusinesses.length}{" "}
     {sortedBusinesses.length === 1
@@ -573,7 +575,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
       : "profesionales encontrados"}
   </p>
 
-  <div className="flex items-center gap-3">
+  <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
     <label
       htmlFor="sort-contractors"
       className="font-semibold text-gray-700"
@@ -588,7 +590,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
     setSortOption(e.target.value);
     setCurrentPage(1);
   }}
-      className="rounded border bg-white p-3"
+      className="w-full min-w-0 rounded border bg-white p-3 sm:w-auto"
     >
       <option value="ranking">Recomendados</option>
       <option value="rating">Mejor calificación</option>
@@ -618,7 +620,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
             </div>
           )}
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {paginatedBusinesses.map((business) => (
             <article
   key={business.id}
@@ -631,7 +633,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
       router.push(`/contractors/${business.id}`);
     }
   }}
-  className={`relative cursor-pointer rounded-2xl border-2 p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-200 ${
+  className={`relative cursor-pointer rounded-2xl border-2 p-5 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-200 sm:p-6 ${
   business.isFeatured
     ? "border-purple-400 bg-gradient-to-br from-purple-50 to-white ring-2 ring-purple-100"
     : "border-transparent bg-white"
@@ -639,7 +641,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
 >
 {business.isFeatured && (
   <span
-    className={`absolute left-4 top-4 z-10 rounded-full px-3 py-1 text-xs font-bold shadow ${
+    className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-xs font-bold shadow sm:left-4 sm:top-4 ${
       business.plan?.toLowerCase() === "premium"
         ? "bg-amber-400 text-amber-950"
         : "bg-purple-600 text-white"
@@ -666,7 +668,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
         ? "Quitar de favoritos"
         : "Guardar profesional"
     }
-    className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border bg-white text-2xl shadow-md transition hover:scale-110 hover:bg-red-50"
+    className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border bg-white text-2xl shadow-md transition hover:scale-110 hover:bg-red-50 sm:right-4 sm:top-4"
   >
     {favoriteIds.includes(business.id) ? "❤️" : "🤍"}
   </button>
@@ -675,10 +677,10 @@ const paginatedBusinesses = sortedBusinesses.slice(
   <img
     src={business.logo_url}
     alt={`Logo de ${business.business_name}`}
-    className="mx-auto mb-5 h-28 w-28 rounded-full border-4 border-white bg-white object-contain shadow-lg"
+    className="mx-auto mb-4 h-24 w-24 rounded-full border-4 border-white bg-white object-contain shadow-lg sm:mb-5 sm:h-28 sm:w-28"
   />
 ) : (
-  <div className="mx-auto mb-5 flex h-28 w-28 items-center justify-center rounded-full bg-blue-100 text-5xl shadow-lg">
+  <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-4xl shadow-lg sm:mb-5 sm:h-28 sm:w-28 sm:text-5xl">
     🛠️
   </div>
 )} 
@@ -705,7 +707,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
   )}
   </div>
 )}
-              <h2 className="text-center text-2xl font-bold">
+              <h2 className="break-words text-center text-xl font-bold sm:text-2xl">
                 {business.business_name}
               </h2>
 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -781,14 +783,14 @@ const paginatedBusinesses = sortedBusinesses.slice(
       href={`https://wa.me/52${business.phone.replace(/\D/g, "")}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="rounded-xl bg-green-500 px-4 py-3 text-center font-bold text-white transition hover:bg-green-600"
+      className="rounded-xl bg-green-500 px-2 py-3 text-center text-sm font-bold text-white transition hover:bg-green-600 sm:px-4 sm:text-base"
     >
       💬 WhatsApp
     </a>
 
     <a
       href={`tel:${business.phone}`}
-      className="rounded-xl bg-gray-800 px-4 py-3 text-center font-bold text-white transition hover:bg-gray-900"
+      className="rounded-xl bg-gray-800 px-2 py-3 text-center text-sm font-bold text-white transition hover:bg-gray-900 sm:px-4 sm:text-base"
     >
       📞 Llamar
     </a>
@@ -800,7 +802,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
           ))}
         </div>
         {sortedBusinesses.length > 0 && totalPages > 1 && (
-  <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+  <div className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
     <button
       type="button"
       onClick={() =>
@@ -812,7 +814,7 @@ const paginatedBusinesses = sortedBusinesses.slice(
       Anterior
     </button>
 
-    <span className="rounded border bg-white px-4 py-2 font-semibold text-gray-700">
+    <span className="order-first col-span-2 rounded border bg-white px-4 py-2 text-center font-semibold text-gray-700 sm:order-none">
       Página {currentPage} de {totalPages}
     </span>
 
@@ -838,7 +840,7 @@ export default function ContractorsPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-gray-100 p-8">
+        <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
           <p>Cargando profesionales...</p>
         </main>
       }

@@ -145,44 +145,42 @@ setBusinesses(dailyRotatedBusinesses);
     loadFeatured();
   }, []);
   useEffect(() => {
-    if (businesses.length <= 3) {
-      return;
-    }
+  if (businesses.length <= 1) {
+    return;
+  }
 
-    const intervalId = window.setInterval(() => {
-      setCurrentIndex(
-        (index) =>
-          (index + 3) % businesses.length
-      );
-    }, 8000);
+  const intervalId = window.setInterval(() => {
+    setCurrentIndex(
+      (index) =>
+        (index + 1) % businesses.length
+    );
+  }, 8000);
 
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [businesses.length]);
+  return () => {
+    window.clearInterval(intervalId);
+  };
+}, [businesses.length]);
 
-  const visibleBusinesses =
-    businesses.length <= 3
-      ? businesses
-      : [0, 1, 2]
-          .map(
-            (offset) =>
-              businesses[
-                (currentIndex + offset) %
-                  businesses.length
-              ]
-          )
-          .filter(
-            (business): business is Business =>
-              Boolean(business)
-          );
+const visibleBusinesses = Array.from(
+  {
+    length: Math.min(3, businesses.length),
+  },
+  (_value, offset) =>
+    businesses[
+      (currentIndex + offset) %
+        businesses.length
+    ]
+).filter(
+  (business): business is Business =>
+    Boolean(business)
+);
   return (
-    <section className="mx-auto mt-16 max-w-6xl px-6">
-      <h2 className="text-center text-4xl font-bold">
+    <section className="mx-auto mt-12 max-w-6xl px-4 sm:mt-16 sm:px-6">
+      <h2 className="text-center text-3xl font-bold leading-tight sm:text-4xl">
         👑 Profesionales Premium destacados
       </h2>
 
-      <p className="mt-3 text-center text-gray-600">
+      <p className="mt-3 text-center text-sm leading-relaxed text-gray-600 sm:text-base">
         Descubre negocios Premium con mayor visibilidad en Servi Pro Monterrey.
       </p>
 
@@ -206,12 +204,14 @@ setBusinesses(dailyRotatedBusinesses);
           </div>
         )}
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {visibleBusinesses.map((business) => (
+      <div className="mt-8 grid gap-4 sm:mt-10 sm:gap-6 md:grid-cols-3">
+        {visibleBusinesses.map((business, index) => (
           <article
-            key={business.id}
-            className="relative rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-purple-50 p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-          >
+  key={business.id}
+  className={`relative rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-purple-50 p-5 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl sm:p-6 ${
+    index > 0 ? "hidden md:block" : ""
+  }`}
+>
             <span className="absolute left-4 top-4 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-950 shadow">
   👑 Premium
 </span>
@@ -219,10 +219,10 @@ setBusinesses(dailyRotatedBusinesses);
               <img
                 src={business.logo_url}
                 alt={`Logo de ${business.business_name}`}
-                className="mx-auto mb-5 h-28 w-28 rounded-full border-4 border-white bg-white object-contain shadow-lg"
+                className="mx-auto mb-4 h-24 w-24 rounded-full border-4 border-white bg-white object-contain shadow-lg sm:mb-5 sm:h-28 sm:w-28"
               />
             ) : (
-              <div className="mx-auto mb-5 flex h-28 w-28 items-center justify-center rounded-full bg-blue-100 text-5xl shadow-lg">
+              <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-4xl shadow-lg sm:mb-5 sm:h-28 sm:w-28 sm:text-5xl">
                 🛠️
               </div>
             )}
@@ -248,7 +248,7 @@ setBusinesses(dailyRotatedBusinesses);
               )}
             </div>
 
-            <h3 className="text-center text-2xl font-bold">
+            <h3 className="text-center text-xl font-bold sm:text-2xl">
               {business.business_name}
             </h3>
 

@@ -149,20 +149,23 @@ export default function PlatformStats() {
   ];
 
   return (
-    <section className="bg-blue-700 py-14 text-white">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-8 text-center sm:grid-cols-2 lg:grid-cols-4">
+    <section className="bg-blue-700 py-10 text-white sm:py-14">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 gap-3 text-center sm:gap-8 lg:grid-cols-4">
           {items.map((item) => (
-            <div key={item.label}>
-              <div className="text-4xl">
+            <div
+  key={item.label}
+  className="min-w-0 rounded-xl bg-white/10 p-4 sm:bg-transparent sm:p-0"
+>
+              <div className="text-3xl sm:text-4xl">
                 {item.icon}
               </div>
 
-              <p className="mt-3 text-4xl font-extrabold">
+              <p className="mt-2 text-3xl font-extrabold sm:mt-3 sm:text-4xl">
                 {loading ? "—" : item.value}
               </p>
 
-              <p className="mt-2 text-blue-100">
+              <p className="mt-2 text-sm leading-snug text-blue-100 sm:text-base">
                 {item.label}
               </p>
             </div>
