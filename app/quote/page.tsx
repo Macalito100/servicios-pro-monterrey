@@ -42,6 +42,50 @@ const [preferredDate, setPreferredDate] = useState("");
 const [preferredTimeWindow, setPreferredTimeWindow] = useState("");
 const [alternativeDate, setAlternativeDate] = useState("");
 useEffect(() => {
+  async function loadCustomerInformation() {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error(
+        "Error al cargar la información del cliente:",
+        error
+      );
+      return;
+    }
+
+    if (
+      !session ||
+      session.user.user_metadata?.account_type !== "customer"
+    ) {
+      return;
+    }
+
+    setName(
+      (currentName) =>
+        currentName ||
+        session.user.user_metadata?.full_name ||
+        ""
+    );
+
+    setEmail(
+      (currentEmail) =>
+        currentEmail || session.user.email || ""
+    );
+
+    setPhone(
+      (currentPhone) =>
+        currentPhone ||
+        session.user.user_metadata?.phone ||
+        ""
+    );
+  }
+
+  loadCustomerInformation();
+}, []);
+useEffect(() => {
   async function loadSelectedBusiness() {
     if (!businessId) {
       return;
