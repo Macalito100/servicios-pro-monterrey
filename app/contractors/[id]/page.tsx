@@ -155,68 +155,64 @@ const averageRating =
       ) / reviews.length
     : 0;
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      <div className="mx-auto max-w-3xl rounded-xl bg-white p-8 shadow">
-        <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 p-10 text-center text-white">
+  <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
+    <div className="mx-auto max-w-3xl rounded-xl bg-white p-4 shadow sm:p-8">
+      <section className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-6 text-center text-white sm:p-10">
+        {business.logo_url ? (
+          <img
+            src={business.logo_url}
+            alt={`Logo de ${business.business_name}`}
+            className="mx-auto h-24 w-24 rounded-full border-4 border-white bg-white object-contain shadow-lg sm:h-36 sm:w-36"
+          />
+        ) : (
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-lg sm:h-36 sm:w-36 sm:text-7xl">
+            🛠️
+          </div>
+        )}
 
-  {business.logo_url ? (
-    <img
-      src={business.logo_url}
-      alt={`Logo de ${business.business_name}`}
-      className="mx-auto h-36 w-36 rounded-full border-4 border-white bg-white object-contain shadow-lg"
-    />
-  ) : (
-    <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-white text-7xl shadow-lg">
-      🛠️
-    </div>
-  )}
+        <h1 className="mt-4 break-words text-3xl font-extrabold leading-tight sm:mt-6 sm:text-4xl">
+          {business.business_name}
+        </h1>
 
-  <h1 className="mt-6 text-4xl font-extrabold">
-    {business.business_name}
-  </h1>
+        <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-3">
+          <span className="rounded-full bg-yellow-400 px-3 py-1.5 text-sm font-bold text-black sm:px-4 sm:py-2 sm:text-base">
+            {reviews.length > 0
+              ? `⭐ ${averageRating.toFixed(1)} (${reviews.length})`
+              : "⭐ Sin reseñas"}
+          </span>
 
-  <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <span className="rounded-full bg-green-500 px-3 py-1.5 text-sm font-bold text-white sm:px-4 sm:py-2 sm:text-base">
+            ✔ Profesional aprobado
+          </span>
+        </div>
 
-    <span className="rounded-full bg-yellow-400 px-4 py-2 font-bold text-black">
-      {reviews.length > 0
-        ? `⭐ ${averageRating.toFixed(1)} (${reviews.length})`
-        : "⭐ Sin reseñas"}
-    </span>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+          <a
+            href={`tel:${business.phone}`}
+            className="rounded-xl bg-gray-800 px-3 py-3 text-center text-sm font-bold text-white transition hover:bg-gray-900 sm:px-8 sm:text-base"
+          >
+            📞 Llamar
+          </a>
 
-    <span className="rounded-full bg-green-500 px-4 py-2 font-bold text-white">
-  ✔ Profesional aprobado
-</span>
+          <a
+            href={`https://wa.me/52${business.phone.replace(/\D/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl bg-green-500 px-3 py-3 text-center text-sm font-bold text-white transition hover:bg-green-600 sm:px-8 sm:text-base"
+          >
+            💬 WhatsApp
+          </a>
 
-</div>
+          <a
+            href={`/quote?business=${business.id}`}
+            className="col-span-2 rounded-xl bg-white px-4 py-3 text-center text-sm font-bold text-blue-700 transition hover:bg-gray-100 sm:col-span-1 sm:px-8 sm:text-base"
+          >
+            📝 Solicitar servicio
+          </a>
+        </div>
+      </section>
 
-<div className="mt-8 flex flex-wrap justify-center gap-4">
-  <a
-    href={`tel:${business.phone}`}
-    className="rounded-xl bg-gray-800 px-8 py-3 font-bold text-white transition hover:bg-gray-900"
-  >
-    📞 Llamar
-  </a>
-
-  <a
-    href={`https://wa.me/52${business.phone.replace(/\D/g, "")}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="rounded-xl bg-green-500 px-8 py-3 font-bold text-white transition hover:bg-green-600"
-  >
-    💬 WhatsApp
-  </a>
-
-  <a
-    href={`/quote?business=${business.id}`}
-    className="rounded-xl bg-white px-8 py-3 font-bold text-blue-700 transition hover:bg-gray-100"
-  >
-    📝 Solicitar servicio
-  </a>
-</div>
-
-</div>
-
-<div className="mt-6 grid gap-4 rounded-xl border bg-gray-50 p-6 sm:grid-cols-2">
+<div className="mt-6 grid gap-4 rounded-xl border bg-gray-50 p-4 sm:grid-cols-2 sm:p-6">
   <div>
     <p className="text-sm text-gray-500">
       Servicio principal
