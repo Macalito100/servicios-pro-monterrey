@@ -17,10 +17,11 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setSubmitting(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } =
+  await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
     setSubmitting(false);
 
@@ -29,6 +30,18 @@ export default function AdminLoginPage() {
       alert("Correo o contraseña incorrectos.");
       return;
     }
+    if (
+  !data.user ||
+  data.user.app_metadata?.role !== "admin"
+) {
+  await supabase.auth.signOut();
+
+  alert(
+    "Esta cuenta no tiene acceso administrativo."
+  );
+
+  return;
+}
 
     router.push("/admin/businesses");
     router.refresh();

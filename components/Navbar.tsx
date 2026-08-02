@@ -43,13 +43,18 @@ useEffect(() => {
   setLoggedIn(true);
 
   const metadataType =
-    session.user.user_metadata?.account_type;
+  session.user.user_metadata?.account_type;
 
-  setAccountType(
-    metadataType === "customer"
-      ? "customer"
-      : "business"
-  );
+const isAdmin =
+  session.user.app_metadata?.role === "admin";
+
+setAccountType(
+  isAdmin
+    ? "admin"
+    : metadataType === "customer"
+    ? "customer"
+    : "business"
+);
 }
 
     loadUser();
@@ -67,13 +72,18 @@ useEffect(() => {
     setLoggedIn(true);
 
     const metadataType =
-      session.user.user_metadata?.account_type;
+  session.user.user_metadata?.account_type;
 
-    setAccountType(
-      metadataType === "customer"
-        ? "customer"
-        : "business"
-    );
+const isAdmin =
+  session.user.app_metadata?.role === "admin";
+
+setAccountType(
+  isAdmin
+    ? "admin"
+    : metadataType === "customer"
+    ? "customer"
+    : "business"
+);
   }
 );
 
@@ -271,7 +281,17 @@ useEffect(() => {
                       </Link>
                     </>
                   )}
-
+{accountType === "admin" && (
+  <Link
+    href="/admin/businesses"
+    onClick={() =>
+      setAccountMenuOpen(false)
+    }
+    className="block px-4 py-3 font-medium text-gray-700 hover:bg-gray-100"
+  >
+    🛡️ Panel de administración
+  </Link>
+)}
                   {accountType === "business" && (
   <>
     <Link
@@ -308,7 +328,7 @@ useEffect(() => {
             </div>
           )}
 
-          {accountType !== "business" && (
+          {(!loggedIn || accountType === "customer") && (
   <Link
     href="/quote"
     className="block w-full whitespace-nowrap rounded bg-green-600 px-4 py-3 text-center font-semibold text-white hover:bg-green-700 md:w-auto md:py-2"

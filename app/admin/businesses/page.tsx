@@ -24,14 +24,19 @@ const [statusFilter, setStatusFilter] = useState("pending");
   useEffect(() => {
     async function loadBusinesses() {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+  data: { user },
+  error: userError,
+} = await supabase.auth.getUser();
 
-      if (!session) {
-        router.push("/admin/login");
-        return;
-      }
-
+if (
+  userError ||
+  !user ||
+  user.app_metadata?.role !== "admin"
+) {
+  await supabase.auth.signOut();
+  router.replace("/admin/login");
+  return;
+}
       const { data, error } = await supabase
         .from("business_registrations")
         .select("*")
@@ -55,8 +60,9 @@ async function updateBusinessStatus(
   const { data, error } = await supabase
     .from("business_registrations")
     .update({
-      approval_status: status,
-    })
+  approval_status: status,
+  status,
+})
     .eq("id", id)
     .select("id, approval_status")
     .single();
