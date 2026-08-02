@@ -12,6 +12,8 @@ export default function CustomerRegisterPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+  useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,8 +23,14 @@ export default function CustomerRegisterPage() {
   ) {
     event.preventDefault();
 
-    setLoading(true);
     setMessage("");
+
+if (password !== confirmPassword) {
+  setMessage("Las contraseñas no coinciden.");
+  return;
+}
+
+setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -165,7 +173,43 @@ router.refresh();
               placeholder="Mínimo 6 caracteres"
             />
           </div>
+<div>
+  <label
+    htmlFor="confirmPassword"
+    className="mb-2 block font-semibold"
+  >
+    Confirmar contraseña
+  </label>
 
+  <input
+    id="confirmPassword"
+    type="password"
+    value={confirmPassword}
+    onChange={(event) =>
+      setConfirmPassword(event.target.value)
+    }
+    required
+    minLength={6}
+    aria-invalid={
+      confirmPassword.length > 0 &&
+      password !== confirmPassword
+    }
+    className={`w-full rounded border p-3 ${
+      confirmPassword.length > 0 &&
+      password !== confirmPassword
+        ? "border-red-500"
+        : ""
+    }`}
+    placeholder="Escribe nuevamente tu contraseña"
+  />
+
+  {confirmPassword.length > 0 &&
+    password !== confirmPassword && (
+      <p className="mt-2 text-sm font-semibold text-red-600">
+        Las contraseñas no coinciden.
+      </p>
+    )}
+</div>
           {message && (
             <div className="rounded bg-blue-50 p-3 text-sm text-blue-800">
               {message}

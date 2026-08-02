@@ -113,19 +113,35 @@ export default function BusinessSignupPage() {
             required
           />
 
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(event) =>
-              setConfirmPassword(
-                event.target.value
-              )
-            }
-            placeholder="Confirmar contraseña"
-            className="w-full rounded border p-3"
-            minLength={6}
-            required
-          />
+          <div>
+  <input
+    type="password"
+    value={confirmPassword}
+    onChange={(event) =>
+      setConfirmPassword(event.target.value)
+    }
+    placeholder="Confirmar contraseña"
+    minLength={6}
+    required
+    aria-invalid={
+      confirmPassword.length > 0 &&
+      password !== confirmPassword
+    }
+    className={`w-full rounded border p-3 ${
+      confirmPassword.length > 0 &&
+      password !== confirmPassword
+        ? "border-red-500"
+        : ""
+    }`}
+  />
+
+  {confirmPassword.length > 0 &&
+    password !== confirmPassword && (
+      <p className="mt-2 text-sm font-semibold text-red-600">
+        Las contraseñas no coinciden.
+      </p>
+    )}
+</div>
 
           <button
             type="submit"
