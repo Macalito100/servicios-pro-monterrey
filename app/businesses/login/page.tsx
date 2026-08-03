@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export default function BusinessLoginPage() {
@@ -58,14 +59,27 @@ export default function BusinessLoginPage() {
             required
           />
 
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border p-3"
-            required
-          />
+          <div>
+  <input
+    type="password"
+    placeholder="Contraseña"
+    value={password}
+    onChange={(e) =>
+      setPassword(e.target.value)
+    }
+    className="w-full rounded border p-3"
+    required
+  />
+
+  <div className="mt-2 text-right">
+    <Link
+      href="/forgot-password"
+      className="text-sm font-semibold text-blue-700 hover:underline"
+    >
+      ¿Olvidaste tu contraseña?
+    </Link>
+  </div>
+</div>
 
           <button
             type="submit"

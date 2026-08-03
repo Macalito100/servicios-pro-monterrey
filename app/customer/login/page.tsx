@@ -97,24 +97,33 @@ export default function CustomerLoginPage() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block font-semibold"
-            >
-              Contraseña
-            </label>
+  <label
+    htmlFor="password"
+    className="mb-2 block font-semibold"
+  >
+    Contraseña
+  </label>
 
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
-              required
-              className="w-full rounded border p-3"
-            />
-          </div>
+  <input
+    id="password"
+    type="password"
+    value={password}
+    onChange={(event) =>
+      setPassword(event.target.value)
+    }
+    required
+    className="w-full rounded border p-3"
+  />
+
+  <div className="mt-2 text-right">
+    <Link
+      href="/forgot-password"
+      className="text-sm font-semibold text-blue-700 hover:underline"
+    >
+      ¿Olvidaste tu contraseña?
+    </Link>
+  </div>
+</div>
 
           {message && (
             <div className="rounded bg-red-50 p-3 text-sm text-red-700">
