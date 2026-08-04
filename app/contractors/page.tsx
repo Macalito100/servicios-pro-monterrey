@@ -24,6 +24,7 @@ type Business = {
   description: string;
   logo_url: string | null;
   verified: boolean;
+  can_invoice: boolean;
     plan: string | null;
   subscription_status: string | null;
   profile_views: number;
@@ -104,6 +105,7 @@ const businessesPerPage = 9;
     description,
     logo_url,
     verified,
+    can_invoice,
 plan,
 subscription_status,
 profile_views,
@@ -727,6 +729,11 @@ const paginatedBusinesses = sortedBusinesses.slice(
   <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
   ✔ Profesional aprobado
 </span>
+{business.can_invoice && (
+  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+    🧾 Emite factura
+  </span>
+)}
 </div>
               <div className="mt-4 space-y-2">
   <p className="font-semibold text-gray-700">

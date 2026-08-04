@@ -12,6 +12,7 @@ type Business = {
   municipality: string[];
   logo_url: string | null;
   verified: boolean;
+  can_invoice: boolean;
     plan: string | null;
   subscription_status: string | null;
   profile_views: number;
@@ -50,6 +51,7 @@ export default function FeaturedContractors() {
           municipality,
           logo_url,
           verified,
+          can_invoice,
 plan,
 subscription_status,
 profile_views,
@@ -273,6 +275,11 @@ const visibleBusinesses = Array.from(
               <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
                 ✔ Profesional aprobado
               </span>
+              {business.can_invoice && (
+  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+    🧾 Emite factura
+  </span>
+)}
             </div>
 
             <div className="mt-5 space-y-3 text-gray-700">
