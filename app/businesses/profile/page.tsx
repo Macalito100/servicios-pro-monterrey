@@ -34,7 +34,7 @@ export default function BusinessProfilePage() {
   const [customerType, setCustomerType] = useState("");
   const [municipalities, setMunicipalities] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-
+const [canInvoice, setCanInvoice] = useState(false);
 const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
 const [portfolioImage, setPortfolioImage] = useState<File | null>(null);
 const [portfolioTitle, setPortfolioTitle] = useState("");
@@ -58,8 +58,8 @@ const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
       const { data, error } = await supabase
         .from("business_registrations")
         .select(
-          "id, business_name, phone, email, service, customer_type, municipality, description"
-        )
+  "id, business_name, phone, email, service, customer_type, municipality, description, can_invoice"
+)
         .eq("owner_user_id", user.id)
         .single();
 
@@ -78,6 +78,7 @@ setService(data.service);
 setCustomerType(data.customer_type);
 setMunicipalities(data.municipality ?? []);
 setDescription(data.description);
+setCanInvoice(data.can_invoice ?? false);
 
 const { data: portfolioData, error: portfolioError } =
   await supabase
@@ -274,14 +275,15 @@ async function handleSubmit(
     const { error } = await supabase
       .from("business_registrations")
       .update({
-        business_name: businessName,
-        phone,
-        email,
-        service,
-        customer_type: customerType,
-        municipality: municipalities,
-        description,
-      })
+  business_name: businessName,
+  phone,
+  email,
+  service,
+  customer_type: customerType,
+  municipality: municipalities,
+  description,
+  can_invoice: canInvoice,
+})
       .eq("id", businessId);
 
     setSaving(false);
@@ -429,7 +431,26 @@ async function handleSubmit(
             onChange={(e) => setDescription(e.target.value)}
             required
           />
+<div className="rounded-xl border bg-gray-50 p-4">
+  <p className="font-semibold text-gray-900">
+    ¿Puedes emitir factura?
+  </p>
 
+  <label className="mt-3 flex cursor-pointer items-start gap-3">
+    <input
+      type="checkbox"
+      checked={canInvoice}
+      onChange={(event) =>
+        setCanInvoice(event.target.checked)
+      }
+      className="mt-0.5 h-5 w-5 shrink-0"
+    />
+
+    <span className="text-gray-700">
+      Sí, puedo emitir factura a mis clientes.
+    </span>
+  </label>
+</div>
           <button
             type="submit"
             disabled={saving}

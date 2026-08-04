@@ -18,6 +18,7 @@ type Business = {
   description: string;
   logo_url: string | null;
   verified: boolean;
+  can_invoice: boolean;
 };
 type PortfolioItem = {
   id: number;
@@ -67,7 +68,8 @@ export default async function ContractorProfile({ params }: Props) {
   municipality,
   description,
   logo_url,
-  verified
+verified,
+can_invoice
 `)
     .eq("id", businessId)
     .eq("approval_status", "approved")
@@ -184,6 +186,11 @@ const averageRating =
           <span className="rounded-full bg-green-500 px-3 py-1.5 text-sm font-bold text-white sm:px-4 sm:py-2 sm:text-base">
             ✔ Profesional aprobado
           </span>
+          {business.can_invoice && (
+  <span className="rounded-full bg-white px-4 py-2 font-bold text-blue-700">
+    🧾 Emite factura
+  </span>
+)}
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">

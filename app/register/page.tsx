@@ -29,6 +29,7 @@ export default function RegisterPage() {
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
+  const [canInvoice, setCanInvoice] = useState(false);
   const [email, setEmail] = useState("");
   const [service, setService] = useState("");
   const [customerType, setCustomerType] = useState("");
@@ -199,6 +200,7 @@ const [logo, setLogo] = useState<File | null>(null);
       customer_type: customerType,
       municipality: municipalities,
       description,
+      can_invoice: canInvoice,
       owner_user_id: session.user.id,
       logo_url: logoUrl,
     });
@@ -404,7 +406,31 @@ const [logo, setLogo] = useState<File | null>(null);
               onChange={(e) => setDescription(e.target.value)}
               required
             />
+<div className="rounded-xl border bg-gray-50 p-4">
+  <p className="font-semibold text-gray-900">
+    ¿Puedes emitir factura?
+  </p>
 
+  <label className="mt-3 flex cursor-pointer items-start gap-3">
+    <input
+      type="checkbox"
+      checked={canInvoice}
+      onChange={(event) =>
+        setCanInvoice(event.target.checked)
+      }
+      className="mt-0.5 h-5 w-5 shrink-0"
+    />
+
+    <span className="text-gray-700">
+      Sí, puedo emitir factura a mis clientes.
+    </span>
+  </label>
+
+  <p className="mt-2 text-sm text-gray-500">
+    Esta información es opcional. No necesitas proporcionar tu RFC
+    ni tu Constancia de Situación Fiscal.
+  </p>
+</div>
             <button
               type="submit"
               disabled={submitting}
