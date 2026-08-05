@@ -21,6 +21,12 @@ export default function SiteFooter() {
           >
             Aviso de Privacidad
           </Link>
+          <Link
+  href="/terms"
+  className="text-gray-300 hover:text-white hover:underline"
+>
+  Términos y Condiciones
+</Link>
 
           <Link
             href="/contact"

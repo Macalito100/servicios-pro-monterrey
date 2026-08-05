@@ -83,10 +83,19 @@ export default function PricingPage() {
 
   const [errorMessage, setErrorMessage] =
     useState("");
-
+const [acceptedTerms, setAcceptedTerms] =
+  useState(false);
+  
   async function startCheckout(plan: PaidPlan) {
-    setLoadingPlan(plan);
-    setErrorMessage("");
+  if (!acceptedTerms) {
+    setErrorMessage(
+      "Debes aceptar los términos y autorizar el cobro mensual recurrente antes de continuar."
+    );
+    return;
+  }
+
+  setLoadingPlan(plan);
+  setErrorMessage("");
 
     try {
       const {
@@ -163,6 +172,42 @@ export default function PricingPage() {
             {errorMessage}
           </div>
         )}
+
+<div className="mx-auto mt-8 max-w-3xl rounded-xl border border-purple-200 bg-white p-5 shadow-sm">
+  <label className="flex cursor-pointer items-start gap-3">
+    <input
+      type="checkbox"
+      checked={acceptedTerms}
+      onChange={(event) => {
+        setAcceptedTerms(event.target.checked);
+
+        if (event.target.checked) {
+          setErrorMessage("");
+        }
+      }}
+      className="mt-1 h-5 w-5 shrink-0"
+    />
+
+    <span className="text-sm leading-relaxed text-gray-700">
+      Autorizo el cobro automático mensual del plan que
+      seleccione, por el precio mostrado, en la misma fecha de
+      cada mes hasta que lo cancele. Podré cancelarlo sin
+      penalización desde el panel de mi negocio.
+    </span>
+  </label>
+
+  <p className="mt-3 text-sm text-gray-600">
+    Al continuar, acepto los{" "}
+    <Link
+      href="/terms"
+      target="_blank"
+      className="font-semibold text-purple-700 hover:underline"
+    >
+      Términos y Condiciones
+    </Link>
+    .
+  </p>
+</div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan) => (
