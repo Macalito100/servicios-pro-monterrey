@@ -156,8 +156,58 @@ const averageRating =
         0
       ) / reviews.length
     : 0;
+    const profileUrl =
+  `https://servicios-pro-monterrey.vercel.app/contractors/${business.id}`;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: business.business_name,
+  url: profileUrl,
+  description: business.description,
+  telephone: business.phone,
+
+  ...(business.logo_url
+    ? {
+        logo: business.logo_url,
+        image: business.logo_url,
+      }
+    : {}),
+
+  areaServed: business.municipality.map(
+    (municipality) => ({
+      "@type": "City",
+      name: municipality,
+    })
+  ),
+
+  ...(reviews.length > 0
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: Number(
+            averageRating.toFixed(1)
+          ),
+          reviewCount: reviews.length,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      }
+    : {}),
+};
   return (
   <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData).replace(
+          /</g,
+          "\\u003c"
+        ),
+      }}
+    />
+
+    <div className="mx-auto max-w-3xl rounded-xl bg-white p-4 shadow sm:p-8"></div>
     <div className="mx-auto max-w-3xl rounded-xl bg-white p-4 shadow sm:p-8">
       <section className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-6 text-center text-white sm:p-10">
         {business.logo_url ? (
