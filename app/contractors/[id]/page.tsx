@@ -43,7 +43,7 @@ export async function generateMetadata({
   if (!Number.isInteger(businessId) || businessId <= 0) {
     return {
       title:
-        "Profesional no encontrado | Servi Pro Monterrey",
+        "Profesional no encontrado | Servicios Pro México",
       robots: {
         index: false,
         follow: false,
@@ -67,7 +67,7 @@ export async function generateMetadata({
   if (!business) {
     return {
       title:
-        "Profesional no encontrado | Servi Pro Monterrey",
+        "Profesional no encontrado | Servicios Pro México",
       robots: {
         index: false,
         follow: false,
@@ -95,7 +95,7 @@ export async function generateMetadata({
     `https://www.servipromexico.com/contractors/${businessId}`;
 
   return {
-    title: `${title} | Servi Pro Monterrey`,
+    title: `${title} | Servicios Pro México`,
     description,
 
     alternates: {
@@ -106,7 +106,7 @@ export async function generateMetadata({
       title,
       description,
       url: profileUrl,
-      siteName: "Servi Pro Monterrey",
+      siteName: "Servicios Pro México",
       type: "website",
       images: business.logo_url
         ? [

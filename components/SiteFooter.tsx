@@ -6,7 +6,7 @@ export default function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
         <div>
           <p className="font-bold">
-            Servi Pro Monterrey
+            Servicios Pro México
           </p>
 
           <p className="mt-1 text-sm text-gray-400">

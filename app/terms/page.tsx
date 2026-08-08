@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones | Servi Pro Monterrey",
+  title: "Términos y Condiciones | Servicios Pro México",
   description:
-    "Términos y condiciones de uso de Servi Pro Monterrey.",
+    "Términos y condiciones de uso de Servicios Pro México.",
 };
 
 const contactEmail =
@@ -15,7 +15,7 @@ export default function TermsPage() {
     <main className="min-h-screen bg-gray-100 px-4 py-10 sm:px-6">
       <article className="mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow sm:p-10">
         <p className="font-semibold text-blue-700">
-          Servi Pro Monterrey
+          Servicios Pro México
         </p>
 
         <h1 className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">
@@ -51,7 +51,7 @@ export default function TermsPage() {
           </h2>
 
           <p className="mt-4 leading-relaxed text-gray-700">
-            Servi Pro Monterrey es administrado por Mario
+            Servicios Pro México es administrado por Mario
             Jokzan Camarena Vazquez. El domicilio completo
             del responsable se encuentra disponible en el{" "}
             <Link
@@ -77,17 +77,17 @@ export default function TermsPage() {
 
         <section className="mt-10">
           <h2 className="text-2xl font-bold">
-            3. Función de Servi Pro Monterrey
+            3. Función de Servicios Pro México
           </h2>
 
           <p className="mt-4 leading-relaxed text-gray-700">
-            Servi Pro Monterrey es una plataforma digital que
+            Servicios Pro México es una plataforma digital que
             ayuda a clientes a localizar y contactar
             profesionales y negocios independientes.
           </p>
 
           <p className="mt-3 leading-relaxed text-gray-700">
-            Servi Pro Monterrey no es empleador, representante,
+            Servicios Pro México no es empleador, representante,
             socio ni contratista de los profesionales
             registrados. Los precios, alcances, garantías,
             fechas, materiales y condiciones de cada trabajo
@@ -136,7 +136,7 @@ export default function TermsPage() {
           </p>
 
           <p className="mt-3 leading-relaxed text-gray-700">
-            Servi Pro Monterrey puede revisar, aprobar, rechazar,
+            Servicios Pro México puede revisar, aprobar, rechazar,
             suspender o solicitar correcciones a un perfil
             cuando detecte información incompleta, falsa,
             engañosa o contraria a estos términos.
@@ -235,7 +235,7 @@ export default function TermsPage() {
           </p>
 
           <p className="mt-3 leading-relaxed text-gray-700">
-            Servi Pro Monterrey notificará al titular por correo
+            Servicios Pro México notificará al titular por correo
             electrónico al menos cinco días naturales antes de
             una renovación automática, conforme a la
             legislación aplicable.
@@ -381,7 +381,7 @@ export default function TermsPage() {
           </p>
 
           <p className="mt-3 leading-relaxed text-gray-700">
-            Servi Pro Monterrey no garantiza que un cliente
+            Servicios Pro México no garantiza que un cliente
             reciba propuestas ni que un profesional sea
             contratado. Tampoco controla la ejecución,
             seguridad, calidad o resultado de los trabajos

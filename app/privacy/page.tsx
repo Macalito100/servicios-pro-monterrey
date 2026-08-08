@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Aviso de Privacidad | Servi Pro Monterrey",
+  title: "Aviso de Privacidad | Servicios Pro México",
   description:
-    "Aviso de privacidad de la plataforma Servi Pro Monterrey.",
+    "Aviso de privacidad de la plataforma Servicios Pro México.",
 };
 
 const responsibleName =
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         )}
 
         <p className="font-semibold text-blue-700">
-          Servi Pro Monterrey
+          Servicios Pro México
         </p>
 
         <h1 className="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
 
           <p className="mt-4 leading-relaxed text-gray-700">
             <strong>{responsibleName}</strong>, responsable
-            de la plataforma digital Servi Pro Monterrey,
+            de la plataforma digital Servicios Pro México,
             con domicilio en{" "}
             <strong>{responsibleAddress}</strong>, es
             responsable del tratamiento y protección de sus
@@ -174,7 +174,7 @@ export default function PrivacyPage() {
 
           <p className="mt-4 leading-relaxed text-gray-700">
             Los pagos de suscripciones son procesados por
-            Stripe. Servi Pro Monterrey no almacena los
+            Stripe. Servicios Pro México no almacena los
             números completos de tarjetas bancarias ni sus
             códigos de seguridad. Stripe tratará la
             información de pago conforme a sus propios

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Contacto | Servi Pro Monterrey",
+  title: "Contacto | Servicios Pro México",
   description:
-    "Contacta al equipo de Servi Pro Monterrey para recibir ayuda.",
+    "Contacta al equipo de Servicios Pro México para recibir ayuda.",
 };
 
 const contactEmail =
@@ -19,7 +19,7 @@ export default function ContactPage() {
       <div className="mx-auto max-w-5xl">
         <section className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 p-6 text-center text-white shadow-lg sm:p-10">
           <p className="font-semibold text-blue-100">
-            Servi Pro Monterrey
+            Servicios Pro México
           </p>
 
           <h1 className="mt-2 text-3xl font-bold sm:text-5xl">

@@ -183,7 +183,7 @@ const visibleBusinesses = Array.from(
       </h2>
 
       <p className="mt-3 text-center text-sm leading-relaxed text-gray-600 sm:text-base">
-        Descubre negocios Premium con mayor visibilidad en Servi Pro Monterrey.
+        Descubre negocios Premium con mayor visibilidad en Servicios Pro México.
       </p>
 
       {loading && (

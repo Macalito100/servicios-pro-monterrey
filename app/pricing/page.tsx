@@ -154,7 +154,7 @@ const [acceptedTerms, setAcceptedTerms] =
       <div className="mx-auto max-w-7xl">
         <div className="text-center">
           <p className="font-semibold text-purple-700">
-            Servi Pro Monterrey
+            Servicios Pro México
           </p>
 
           <h1 className="mt-2 text-4xl font-bold text-gray-900">

@@ -117,11 +117,17 @@ setAccountType(
     <nav className="relative z-50 bg-white shadow">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
         <Link
-          href="/"
-          className="max-w-[13rem] text-lg font-bold leading-tight text-blue-700 sm:max-w-64 sm:text-xl"
-        >
-          Servicios Pro Monterrey México
-        </Link>
+  href="/"
+  className="max-w-[13rem] leading-tight text-blue-700 sm:max-w-64"
+>
+  <span className="block text-lg font-bold sm:text-xl">
+    Servicios Pro México
+  </span>
+
+  <span className="block text-xs font-semibold text-gray-600">
+    Profesionales en Monterrey
+  </span>
+</Link>
 <button
   type="button"
   onClick={() =>

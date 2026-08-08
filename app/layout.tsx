@@ -21,16 +21,15 @@ export const metadata: Metadata = {
   ),
 
   title: {
-    default: "Servicios Pro Monterrey México",
-    template:
-      "%s | Servicios Pro Monterrey México",
+    default:
+      "Servicios Pro México | Profesionales en Monterrey",
+    template: "%s | Servicios Pro México",
   },
 
   description:
     "Encuentra profesionales confiables para tu hogar o negocio en Monterrey y su área metropolitana. Solicita cotizaciones y consulta perfiles, portafolios y reseñas.",
 
-  applicationName:
-    "Servicios Pro Monterrey México",
+  applicationName: "Servicios Pro México",
 
   keywords: [
     "servicios profesionales Monterrey",
@@ -47,18 +46,20 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Servicios Pro Monterrey México",
+    title:
+      "Servicios Pro México | Profesionales en Monterrey",
     description:
       "Encuentra profesionales confiables para tu hogar o negocio en Monterrey y su área metropolitana.",
     url: "/",
-    siteName: "Servicios Pro Monterrey México",
+    siteName: "Servicios Pro México",
     locale: "es_MX",
     type: "website",
   },
 
   twitter: {
     card: "summary",
-    title: "Servicios Pro Monterrey México",
+    title:
+      "Servicios Pro México | Profesionales en Monterrey",
     description:
       "Encuentra profesionales confiables para tu hogar o negocio en Monterrey.",
   },
@@ -79,12 +80,12 @@ export default function RootLayout({
       lang="es-MX"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-    <body className="flex min-h-full flex-col">
-  <Navbar />
-  <BusinessRequestAlerts />
-  {children}
-  <SiteFooter />
-</body>
+      <body className="flex min-h-full flex-col">
+        <Navbar />
+        <BusinessRequestAlerts />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }
