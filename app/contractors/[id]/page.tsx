@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import PortfolioGallery from "@/components/PortfolioGallery";
 import { formatService } from "@/lib/formatService";
@@ -33,6 +34,91 @@ type Review = {
   rating: number;
   review_text: string;
 };
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { id } = await params;
+  const businessId = Number(id);
+
+  if (!Number.isInteger(businessId) || businessId <= 0) {
+    return {
+      title:
+        "Profesional no encontrado | Servi Pro Monterrey",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const { data: business } = await supabase
+    .from("business_registrations")
+    .select(`
+      business_name,
+      service,
+      municipality,
+      description,
+      logo_url
+    `)
+    .eq("id", businessId)
+    .eq("approval_status", "approved")
+    .maybeSingle();
+
+  if (!business) {
+    return {
+      title:
+        "Profesional no encontrado | Servi Pro Monterrey",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const formattedService = formatService(
+    business.service
+  );
+
+  const mainMunicipality =
+    business.municipality?.[0] ?? "Monterrey";
+
+  const title =
+    `${business.business_name} | ` +
+    `${formattedService} en ${mainMunicipality}`;
+
+  const description =
+    business.description?.trim()
+      ? business.description.trim().slice(0, 155)
+      : `Conoce a ${business.business_name}, profesional de ${formattedService} en ${mainMunicipality}.`;
+
+  const profileUrl =
+    `https://servicios-pro-monterrey.vercel.app/contractors/${businessId}`;
+
+  return {
+    title: `${title} | Servi Pro Monterrey`,
+    description,
+
+    alternates: {
+      canonical: profileUrl,
+    },
+
+    openGraph: {
+      title,
+      description,
+      url: profileUrl,
+      siteName: "Servi Pro Monterrey",
+      type: "website",
+      images: business.logo_url
+        ? [
+            {
+              url: business.logo_url,
+              alt: `Logo de ${business.business_name}`,
+            },
+          ]
+        : undefined,
+    },
+  };
+}
 export default async function ContractorProfile({ params }: Props) {
   const { id } = await params;
 
