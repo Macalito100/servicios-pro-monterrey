@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    "https://servicios-pro-monterrey.vercel.app"
+    "https://www.servipromexico.com"
   ),
 
   title: {

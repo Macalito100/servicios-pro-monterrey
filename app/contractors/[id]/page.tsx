@@ -92,7 +92,7 @@ export async function generateMetadata({
       : `Conoce a ${business.business_name}, profesional de ${formattedService} en ${mainMunicipality}.`;
 
   const profileUrl =
-    `https://servicios-pro-monterrey.vercel.app/contractors/${businessId}`;
+    `https://www.servipromexico.com/contractors/${businessId}`;
 
   return {
     title: `${title} | Servi Pro Monterrey`,
@@ -243,7 +243,7 @@ const averageRating =
       ) / reviews.length
     : 0;
     const profileUrl =
-  `https://servicios-pro-monterrey.vercel.app/contractors/${business.id}`;
+  `https://www.servipromexico.com/contractors/${business.id}`;
 
 const structuredData = {
   "@context": "https://schema.org",
