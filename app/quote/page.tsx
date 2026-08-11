@@ -35,6 +35,7 @@ const [requestType, setRequestType] = useState<
   "quote" | "visit"
 >("quote");
 const [service, setService] = useState("");
+const [municipality, setMunicipality] = useState("");
 const [description, setDescription] = useState("");
 const [photos, setPhotos] = useState<File[]>([]);
 
@@ -166,8 +167,9 @@ const fileName =
       phone,
       email,
       property_type: propertyType,
-      service,
-      description,
+service,
+municipality,
+description,
 
       request_type: requestType,
 
@@ -445,7 +447,37 @@ is_read: false,
     </option>
   </select>
 )}
+<select
+  className="w-full rounded border p-3"
+  value={municipality}
+  onChange={(event) =>
+    setMunicipality(event.target.value)
+  }
+  required
+>
+  <option value="" disabled>
+    Selecciona el municipio donde necesitas el servicio
+  </option>
 
+  <option value="Monterrey">Monterrey</option>
+  <option value="San Pedro Garza García">
+    San Pedro Garza García
+  </option>
+  <option value="San Nicolás de los Garza">
+    San Nicolás de los Garza
+  </option>
+  <option value="Guadalupe">Guadalupe</option>
+  <option value="Apodaca">Apodaca</option>
+  <option value="Santa Catarina">
+    Santa Catarina
+  </option>
+  <option value="General Escobedo">
+    General Escobedo
+  </option>
+  <option value="García">García</option>
+  <option value="Juárez">Juárez</option>
+  <option value="Santiago">Santiago</option>
+</select>
             <textarea
   className="w-full border p-3 rounded"
   placeholder="Describe el trabajo que necesitas y en qué zona de Monterrey se encuentra"

@@ -157,81 +157,115 @@ console.log("Logged in user:", user.id);
       }
 
       const {
-        data: requestData,
-        error: requestError,
-      } = await supabase
-        .from("quote_requests")
-        .select(`
-  id,
-  created_at,
-  customer_id,
-  business_id,
-  name,
-          phone,
-          email,
-          property_type,
-          service,
-          description,
-          photo_urls,
-          request_type,
-          preferred_date,
-          preferred_time_window,
-          alternative_date,
-          status,
-          is_read,
-          business_response,
-          responded_at
-        `)
-        .eq("id", requestId)
+  data: recipientData,
+  error: recipientError,
+} = await supabase
+  .from("quote_request_recipients")
+  .select("id, status, is_read")
+  .eq("quote_request_id", requestId)
+  .eq("business_id", business.id)
+  .maybeSingle();
+
+if (recipientError) {
+  console.error(
+    "No se pudo comprobar la asignación:",
+    recipientError
+  );
+
+  setErrorMessage(
+    "No se pudo comprobar esta solicitud."
+  );
+  setLoading(false);
+  return;
+}
+
+const {
+  data: requestData,
+  error: requestError,
+} = await supabase
+  .from("quote_requests")
+  .select(`
+    id,
+    created_at,
+    customer_id,
+    business_id,
+    name,
+    phone,
+    email,
+    property_type,
+    service,
+    description,
+    photo_urls,
+    request_type,
+    preferred_date,
+    preferred_time_window,
+    alternative_date,
+    status,
+    is_read,
+    business_response,
+    responded_at
+  `)
+  .eq("id", requestId)
+  .maybeSingle();
+
+const belongsDirectly =
+  requestData?.business_id === business.id;
+
+const belongsThroughRouting =
+  Boolean(recipientData);
+
+if (
+  requestError ||
+  !requestData ||
+  (!belongsDirectly && !belongsThroughRouting)
+) {
+  console.error(
+    "No se pudo cargar la solicitud:",
+    requestError
+  );
+
+  setErrorMessage(
+    "No se encontró esta solicitud o no pertenece a tu negocio."
+  );
+  setLoading(false);
+  return;
+}
+
+const loadedRequest = {
+  ...requestData,
+  business_id:
+    requestData.business_id ?? business.id,
+  status:
+    recipientData?.status ?? requestData.status,
+  is_read:
+    recipientData?.is_read ?? requestData.is_read,
+} as QuoteRequest;
+
+setRequest(loadedRequest);
+
+if (!loadedRequest.is_read) {
+  const { error: readError } = recipientData
+    ? await supabase
+        .from("quote_request_recipients")
+        .update({ is_read: true })
+        .eq("id", recipientData.id)
         .eq("business_id", business.id)
-        .single();
+    : await supabase
+        .from("quote_requests")
+        .update({ is_read: true })
+        .eq("id", loadedRequest.id)
+        .eq("business_id", business.id);
 
-console.log("Looking for request:", requestId);
-console.log("Request result:", requestData);
-console.log("Request error:", requestError);
-
-      if (requestError || !requestData) {
-        console.error(
-          "No se encontró la solicitud:",
-          requestError
-        );
-
-        setErrorMessage(
-          "No se encontró esta solicitud o no pertenece a tu negocio."
-        );
-        setLoading(false);
-        return;
-      }
-
-      const loadedRequest =
-        requestData as QuoteRequest;
-
-      setRequest(loadedRequest);
-
-
-      if (!loadedRequest.is_read) {
-        const { error: readError } = await supabase
-          .from("quote_requests")
-          .update({ is_read: true })
-          .eq("id", loadedRequest.id)
-          .eq("business_id", business.id);
-
-        if (readError) {
-          console.error(
-            "No se pudo marcar como leída:",
-            readError
-          );
-        } else {
-          setRequest((current) =>
-            current
-              ? {
-                  ...current,
-                  is_read: true,
-                }
-              : current
-          );
-        }
-      }
+  if (readError) {
+    console.error(
+      "No se pudo marcar la solicitud como leída:",
+      readError
+    );
+  } else {
+    loadedRequest.is_read = true;
+    setRequest({ ...loadedRequest });
+  }
+}
 
       setLoading(false);
     }

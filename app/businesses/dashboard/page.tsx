@@ -76,7 +76,7 @@ export default function BusinessDashboardPage() {
   
 const [requestFilter, setRequestFilter] = useState<
   "all" | "new" | "accepted" | "rejected"
->("all");
+>("new");
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -192,7 +192,8 @@ if (conversationError) {
         head: true,
       })
       .in("conversation_id", conversationIds)
-      .eq("is_read", false);
+.eq("is_read", false)
+.neq("sender_id", user.id);
 
     if (unreadError) {
       console.error(
@@ -253,13 +254,40 @@ if (portfolioError) {
 } else {
   setPortfolioCount(portfolioTotal ?? 0);
 }
-const { data: quoteData, error: quoteError } = await supabase
-  .from("quote_requests")
-.select(
-  "id, created_at, customer_id, business_id, name, phone, email, property_type, service, description, photo_urls, status, is_read"
-)
-.eq("business_id", data.id)
-.order("created_at", { ascending: false });
+const {
+  data: recipientData,
+  error: recipientError,
+} = await supabase
+  .from("quote_request_recipients")
+  .select("quote_request_id, status, is_read")
+  .eq("business_id", data.id);
+
+if (recipientError) {
+  console.error(
+    "No se pudieron cargar las solicitudes asignadas:",
+    recipientError
+  );
+}
+
+const routedRequestIds = (recipientData ?? []).map(
+  (recipient) => recipient.quote_request_id
+);
+
+const quoteFilter =
+  routedRequestIds.length > 0
+    ? `business_id.eq.${data.id},id.in.(${routedRequestIds.join(
+        ","
+      )})`
+    : `business_id.eq.${data.id}`;
+
+const { data: quoteData, error: quoteError } =
+  await supabase
+    .from("quote_requests")
+    .select(
+      "id, created_at, customer_id, business_id, name, phone, email, property_type, service, description, photo_urls, status, is_read"
+    )
+    .or(quoteFilter)
+    .order("created_at", { ascending: false });
 
 if (quoteError) {
   console.error(
@@ -267,7 +295,31 @@ if (quoteError) {
     quoteError
   );
 } else {
-  setRequests((quoteData ?? []) as QuoteRequest[]);
+  const recipientByRequestId = new Map(
+  (recipientData ?? []).map((recipient) => [
+    recipient.quote_request_id,
+    recipient,
+  ])
+);
+
+const normalizedRequests = (quoteData ?? []).map(
+  (request) => {
+    const recipient =
+      recipientByRequestId.get(request.id);
+
+    if (!recipient) {
+      return request;
+    }
+
+    return {
+      ...request,
+      status: recipient.status,
+      is_read: recipient.is_read,
+    };
+  }
+);
+
+setRequests(normalizedRequests as QuoteRequest[]);
 }
 
 const {
@@ -363,7 +415,50 @@ async function updateAppointmentStatus(
     )
   );
 }
+async function markRequestsAsRead() {
+  if (!business) {
+    return;
+  }
 
+  const routedResult = await supabase
+    .from("quote_request_recipients")
+    .update({ is_read: true })
+    .eq("business_id", business.id)
+    .eq("is_read", false);
+
+  if (routedResult.error) {
+    console.error(
+      "No se pudieron marcar las solicitudes distribuidas como leídas:",
+      routedResult.error
+    );
+    return;
+  }
+
+  const directResult = await supabase
+    .from("quote_requests")
+    .update({ is_read: true })
+    .eq("business_id", business.id)
+    .eq("is_read", false);
+
+  if (directResult.error) {
+    console.error(
+      "No se pudieron marcar las solicitudes directas como leídas:",
+      directResult.error
+    );
+    return;
+  }
+
+  setRequests((current) =>
+    current.map((request) => ({
+      ...request,
+      is_read: true,
+    }))
+  );
+
+  document
+    .getElementById("solicitudes")
+    ?.scrollIntoView({ behavior: "smooth" });
+}
   async function handleLogout() {
     await supabase.auth.signOut();
     router.push("/businesses/login");
@@ -759,18 +854,17 @@ const responseRate =
       </p>
     </div>
 
-    <a
-  href="#solicitudes"
-  className="relative rounded-lg bg-yellow-600 px-4 py-2 font-semibold text-white hover:bg-yellow-700"
->
-  Ver solicitudes
+    <button
+      type="button"
+      onClick={markRequestsAsRead}
+      className="relative rounded-lg bg-amber-600 px-6 py-3 font-bold text-white hover:bg-amber-700"
+    >
+      Ver solicitudes
 
-  {unreadRequests > 0 && (
-    <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-600 px-2 text-xs font-bold text-white">
-      {unreadRequests}
-    </span>
-  )}
-</a>
+      <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-600 px-2 text-xs font-bold text-white">
+        {unreadRequests}
+      </span>
+    </button>
   </div>
 )}
 <section className="mt-8 rounded-xl border border-blue-200 bg-white p-6 shadow">
@@ -1539,32 +1633,19 @@ const responseRate =
     </div>
   )}
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap items-end gap-3">
 
   {/* Nueva solicitud */}
   {request.status !== "accepted" &&
   request.status !== "rejected" && (
     <>
+    
       <a
-        href={`tel:${request.phone}`}
-        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-      >
-        📞 Llamar
-      </a>
-
-      <a
-        href={`mailto:${request.email}`}
-        className="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
-      >
-        ✉️ Correo
-      </a>
-
-      <a
-        href={`/businesses/dashboard/request/${request.id}`}
-        className="rounded bg-gray-800 px-4 py-2 text-white hover:bg-gray-900"
-      >
-        📄 Ver detalles
-      </a>
+  href={`/businesses/dashboard/request/${request.id}`}
+  className="rounded-lg bg-gray-800 px-4 py-2 font-semibold text-white hover:bg-gray-900"
+>
+  📄 Ver detalles
+</a>
 
       <button
   type="button"
@@ -1599,55 +1680,75 @@ const responseRate =
   )}
 
   {/* Solicitud aceptada */}
-  {request.status === "accepted" && (
-    <>
-      {request.customer_id ? (
-  <button
-    type="button"
-    onClick={() =>
-      openRequestConversation(request)
-    }
-    className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
-  >
-    💬 Abrir conversación
-  </button>
-) : (
-  <span className="rounded bg-gray-200 px-4 py-2 font-semibold text-gray-600">
-    👤 Cliente sin cuenta
-  </span>
-)}
-
-      <a
-        href={`tel:${request.phone}`}
-        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+{request.status === "accepted" && (
+  <>
+    {request.customer_id ? (
+      <button
+        type="button"
+        onClick={() =>
+          openRequestConversation(request)
+        }
+        className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
       >
-        📞 Llamar
-      </a>
+        💬 Abrir conversación
+      </button>
+    ) : (
+      <div>
+        <p className="mb-3 text-sm font-semibold text-gray-600">
+          Cliente sin cuenta: contáctalo directamente.
+        </p>
 
-      <a
-        href={`mailto:${request.email}`}
-        className="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
-      >
-        ✉️ Correo
-      </a>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href={`tel:${request.phone}`}
+            className="rounded-lg bg-gray-800 px-4 py-2 font-semibold text-white transition hover:bg-gray-900"
+          >
+            📞 Llamar
+          </a>
 
-      <a
-        href={`/businesses/dashboard/request/${request.id}`}
-        className="rounded bg-gray-800 px-4 py-2 text-white hover:bg-gray-900"
-      >
-        📄 Ver detalles
-      </a>
-    </>
-  )}
+          <a
+            href={`https://wa.me/${
+              request.phone
+                .replace(/\D/g, "")
+                .startsWith("52")
+                ? request.phone.replace(/\D/g, "")
+                : `52${request.phone.replace(/\D/g, "")}`
+            }`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white transition hover:bg-green-700"
+          >
+            💬 WhatsApp
+          </a>
 
-  {/* Solicitud rechazada */}
-  {request.status === "rejected" && (
+          <a
+            href={`mailto:${request.email}?subject=${encodeURIComponent(
+              "Respuesta a tu solicitud en Servicios Pro México"
+            )}`}
+            className="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white transition hover:bg-blue-800"
+          >
+            ✉️ Enviar correo
+          </a>
+        </div>
+      </div>
+    )}
+
     <a
       href={`/businesses/dashboard/request/${request.id}`}
       className="rounded bg-gray-800 px-4 py-2 text-white hover:bg-gray-900"
     >
       📄 Ver detalles
     </a>
+  </>
+)}
+  {/* Solicitud rechazada */}
+  {request.status === "rejected" && (
+    <a
+  href={`/businesses/dashboard/request/${request.id}`}
+  className="h-fit self-end rounded-lg bg-gray-800 px-4 py-2 font-semibold text-white hover:bg-gray-900"
+>
+  📄 Ver detalles
+</a>
   )}
 
 </div>
