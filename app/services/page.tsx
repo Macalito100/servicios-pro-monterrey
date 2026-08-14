@@ -1,18 +1,27 @@
 export default function Services() {
-  const services = [
-    "Electricistas",
-    "Plomería",
-    "Aire acondicionado",
-    "Limpieza",
-    "Pintura",
-    "Carpintería",
-    "Seguridad (Cámaras y Alarmas)",
-    "Jardinería",
-    "Remodelaciones",
-    "Soldadura",
-    "Cerrajería",
-    "Mantenimiento General",
-  ];
+const services = [
+  { name: "Electricistas", value: "electricidad" },
+  { name: "Plomería", value: "plomeria" },
+  {
+    name: "Aire acondicionado",
+    value: "aire-acondicionado",
+  },
+  { name: "Limpieza", value: "limpieza" },
+  { name: "Pintura", value: "pintura" },
+  { name: "Carpintería", value: "carpinteria" },
+  {
+    name: "Seguridad (Cámaras y Alarmas)",
+    value: "seguridad",
+  },
+  { name: "Jardinería", value: "jardineria" },
+  { name: "Remodelaciones", value: "remodelacion" },
+  { name: "Soldadura", value: "soldadura" },
+  { name: "Cerrajería", value: "cerrajeria" },
+  {
+    name: "Mantenimiento General",
+    value: "mantenimiento",
+  },
+];
 
   return (
   <main className="min-h-screen bg-gray-100 px-4 py-6 sm:p-8">
@@ -29,11 +38,11 @@ export default function Services() {
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {services.map((service) => (
           <div
-            key={service}
+            key={service.value}
             className="flex h-full flex-col rounded-xl bg-white p-5 shadow transition hover:shadow-xl sm:p-6"
           >
             <h2 className="text-lg font-bold sm:text-xl">
-              {service}
+              {service.name}
             </h2>
 
             <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-600 sm:text-base">
@@ -42,7 +51,7 @@ export default function Services() {
             </p>
 
             <a
-              href="/contractors"
+              href={`/contractors?service=${service.value}`}
               className="mt-4 block min-h-12 w-full rounded bg-blue-700 px-4 py-3 text-center font-semibold text-white transition hover:bg-blue-800"
             >
               Ver profesionales

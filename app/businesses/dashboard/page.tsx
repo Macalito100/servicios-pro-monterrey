@@ -528,12 +528,14 @@ async function acceptRequest(
   request: QuoteRequest
 ) {
   if (!business) {
-    alert("No se encontró la información del negocio.");
+    alert(
+      "No se encontró la información del negocio."
+    );
     return;
   }
 
   const { data, error } = await supabase.rpc(
-    "accept_quote_request",
+    "express_interest_in_quote_request",
     {
       p_request_id: request.id,
     }
@@ -541,12 +543,12 @@ async function acceptRequest(
 
   if (error) {
     console.error(
-      "No se pudo aceptar la solicitud:",
+      "No se pudo registrar el interés:",
       error
     );
 
     alert(
-      "No se pudo aceptar la solicitud. Inténtalo nuevamente."
+      "No se pudo registrar tu interés. Inténtalo nuevamente."
     );
     return;
   }
@@ -563,75 +565,58 @@ async function acceptRequest(
   }
 
   if (!result.success) {
-    if (result.reason === "free_limit_reached") {
-      alert(
-        "Has alcanzado el límite de 5 trabajos aceptados este mes en el plan Gratis. Actualiza tu plan para aceptar solicitudes ilimitadas."
-      );
-
-      router.push("/pricing");
-      return;
-    }
-
     if (result.reason === "not_authorized") {
       alert(
-        "No tienes permiso para aceptar esta solicitud."
+        "No tienes permiso para responder a esta solicitud."
       );
       return;
     }
 
-    if (result.reason === "request_not_found") {
-      alert("No se encontró esta solicitud.");
+    if (result.reason === "not_assigned") {
+      alert(
+        "Esta solicitud no está asignada a tu negocio."
+      );
       return;
     }
 
     if (result.reason === "invalid_status") {
       alert(
-        "Esta solicitud ya no está disponible para aceptar."
+        "Esta solicitud ya no está disponible."
       );
       return;
     }
 
-    alert("No se pudo aceptar la solicitud.");
+    alert(
+      "No se pudo registrar tu interés."
+    );
     return;
   }
+
+  const respondedAt = new Date().toISOString();
 
   setRequests((current) =>
     current.map((currentRequest) =>
       currentRequest.id === request.id
         ? {
             ...currentRequest,
-            status: "accepted",
+            status: "interested",
             is_read: true,
-            responded_at:
-              new Date().toISOString(),
+            responded_at: respondedAt,
           }
         : currentRequest
     )
   );
 
-  setBusiness((current) =>
-    current
-      ? {
-          ...current,
-          accepted_jobs_this_month:
-            result.accepted_jobs_this_month,
-          accepted_jobs_month:
-            result.accepted_jobs_month,
-        }
-      : current
-  );
-
   if (!request.customer_id) {
     alert(
-      "Solicitud aceptada. Como el cliente envió la solicitud sin una cuenta, comunícate por teléfono o correo."
+      "Interés enviado. Como el cliente no tiene cuenta, comunícate por teléfono, WhatsApp o correo."
     );
     return;
   }
 
-  await openRequestConversation({
-    ...request,
-    status: "accepted",
-  });
+  alert(
+    "Interés enviado correctamente. El cliente podrá comparar las empresas interesadas."
+  );
 }
 
 async function openRequestConversation(
@@ -1530,14 +1515,18 @@ const responseRate =
 
             <span
   className={`rounded-full px-3 py-1 text-sm font-semibold ${
-    request.status === "accepted"
+    request.status === "interested"
+      ? "bg-purple-100 text-purple-700"
+      : request.status === "accepted"
       ? "bg-blue-100 text-blue-700"
       : request.status === "rejected"
       ? "bg-red-100 text-red-700"
       : "bg-yellow-100 text-yellow-700"
   }`}
 >
-  {request.status === "accepted"
+  {request.status === "interested"
+    ? "🙋 Interés enviado"
+    : request.status === "accepted"
     ? "🔵 Aceptada"
     : request.status === "rejected"
     ? "🔴 Rechazada"
@@ -1650,21 +1639,16 @@ const responseRate =
       <button
   type="button"
   onClick={() => acceptRequest(request)}
-  disabled={
-    business.plan?.toLowerCase() === "free" &&
-    (business.accepted_jobs_this_month ?? 0) >= 5
-  }
-  className={`rounded px-4 py-2 text-white ${
-    business.plan?.toLowerCase() === "free" &&
-    (business.accepted_jobs_this_month ?? 0) >= 5
-      ? "cursor-not-allowed bg-gray-400"
-      : "bg-blue-600 hover:bg-blue-700"
+  disabled={request.status === "interested"}
+  className={`rounded px-4 py-2 font-semibold text-white ${
+    request.status === "interested"
+      ? "cursor-not-allowed bg-purple-400"
+      : "bg-purple-600 hover:bg-purple-700"
   }`}
 >
-  {business.plan?.toLowerCase() === "free" &&
-  (business.accepted_jobs_this_month ?? 0) >= 5
-    ? "🚫 Límite alcanzado"
-    : "✔️ Aceptar"}
+  {request.status === "interested"
+    ? "🙋 Interés enviado"
+    : "🙋 Me interesa"}
 </button>
 
       <button
