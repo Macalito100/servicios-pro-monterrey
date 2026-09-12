@@ -47,7 +47,20 @@ business_id: number;
   is_read: boolean;
   status: string;
 };
-
+function formatTimeWindow(value: string | null) {
+  switch (value) {
+    case "morning":
+      return "Mañana — 8:00 a. m. a 12:00 p. m.";
+    case "afternoon":
+      return "Tarde — 12:00 p. m. a 5:00 p. m.";
+    case "evening":
+      return "Noche — 5:00 p. m. a 8:00 p. m.";
+    case "flexible":
+      return "Horario flexible";
+    default:
+      return "No especificado";
+  }
+}
 export default function BusinessDashboardPage() {
   const router = useRouter();
 
@@ -1344,7 +1357,7 @@ const responseRate =
 
     <p>
       <strong>Horario:</strong>{" "}
-      {request.preferred_time_window || "Flexible"}
+      {formatTimeWindow(request.preferred_time_window)}
     </p>
 
     {request.alternative_date && (
