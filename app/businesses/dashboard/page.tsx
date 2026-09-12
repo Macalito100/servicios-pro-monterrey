@@ -75,7 +75,7 @@ export default function BusinessDashboardPage() {
   
   
 const [requestFilter, setRequestFilter] = useState<
-  "all" | "new" | "accepted" | "rejected"
+  "all" | "new" | "interested" | "accepted" | "rejected"
 >("new");
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -99,6 +99,10 @@ const [requestFilter, setRequestFilter] = useState<
 
 const newRequests =
   requests.filter(isNewRequest).length;
+
+  const interestedRequests = requests.filter(
+  (request) => request.status === "interested"
+).length;
 
 const unreadRequests = requests.filter(
   (request) => !request.is_read
@@ -1242,7 +1246,17 @@ const responseRate =
   >
     🟡 Nuevas ({newRequests})
   </button>
-
+<button
+  type="button"
+  onClick={() => setRequestFilter("interested")}
+  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+    requestFilter === "interested"
+      ? "bg-purple-600 text-white shadow"
+      : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
+  }`}
+>
+  🙋 Interés enviado ({interestedRequests})
+</button>
   <button
     type="button"
     onClick={() => setRequestFilter("accepted")}
