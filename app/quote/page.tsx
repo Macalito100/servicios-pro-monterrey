@@ -129,140 +129,133 @@ async function handleSubmit(
   e: React.FormEvent<HTMLFormElement>
 ) {
   e.preventDefault();
+
   if (!turnstileToken) {
-  alert(
-    "Completa la verificación de seguridad."
-  );
-  return;
-}
-
-setSubmitting(true);
-
-try {
-  const verificationResponse = await fetch(
-    "/api/turnstile/verify",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: turnstileToken,
-      }),
-    }
-  );
-
-  if (!verificationResponse.ok) {
     alert(
-      "La verificación de seguridad falló. Actualiza la página e inténtalo nuevamente."
+      "Completa la verificación de seguridad."
     );
-    setSubmitting(false);
     return;
   }
-} catch (error) {
-  console.error(
-    "Error en la verificación de seguridad:",
-    error
-  );
 
-  alert(
-    "No se pudo completar la verificación de seguridad."
-  );
-  setSubmitting(false);
-  return;
-}
+  setSubmitting(true);
 
- const {
-  data: { session },
-} = await supabase.auth.getSession();
+  try {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
 
-const user = session?.user ?? null;
-setSubmittedAsGuest(!user);
-let photoUrls: string[] = [];
-
-if (photos.length > 0) {
-  for (const photo of photos) {
-    const folder =
-  user?.id ?? "guest";
-
-const fileName =
-  `${folder}/${crypto.randomUUID()}-${photo.name}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("request-photos")
-      .upload(fileName, photo);
-
-    if (uploadError) {
+    if (sessionError) {
       console.error(
-        "Error al subir la foto:",
-        uploadError
+        "Error al revisar la sesión:",
+        sessionError
       );
-      continue;
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from("request-photos")
-      .getPublicUrl(fileName);
+    const user = session?.user ?? null;
 
-    photoUrls.push(publicUrl);
+    setSubmittedAsGuest(!user);
+
+    let photoUrls: string[] = [];
+
+    if (photos.length > 0) {
+      for (const photo of photos) {
+        const folder = user?.id ?? "guest";
+
+        const fileName =
+          `${folder}/${crypto.randomUUID()}-${photo.name}`;
+
+        const { error: uploadError } =
+          await supabase.storage
+            .from("request-photos")
+            .upload(fileName, photo);
+
+        if (uploadError) {
+          console.error(
+            "Error al subir la foto:",
+            uploadError
+          );
+          continue;
+        }
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("request-photos")
+          .getPublicUrl(fileName);
+
+        photoUrls.push(publicUrl);
+      }
+    }
+
+    const response = await fetch(
+      "/api/turnstile/verify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+
+          ...(session?.access_token
+            ? {
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              }
+            : {}),
+        },
+
+        body: JSON.stringify({
+          token: turnstileToken,
+          name,
+          phone,
+          email,
+          propertyType,
+          requestType,
+          service,
+          municipality,
+          description,
+          preferredDate,
+          preferredTimeWindow,
+          alternativeDate,
+          businessId:
+            selectedBusiness?.id ?? null,
+          photoUrls,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorResult = await response
+        .json()
+        .catch(() => null);
+
+      console.error(
+        "No se pudo guardar la solicitud:",
+        errorResult
+      );
+
+      setTurnstileToken(null);
+
+      alert(
+        "No se pudo enviar la solicitud. Actualiza la página e inténtalo nuevamente."
+      );
+      return;
+    }
+
+    setSubmitted(true);
+  } catch (error) {
+    console.error(
+      "Error al enviar la solicitud:",
+      error
+    );
+
+    setTurnstileToken(null);
+
+    alert(
+      "No se pudo enviar la solicitud. Actualiza la página e inténtalo nuevamente."
+    );
+  } finally {
+    setSubmitting(false);
   }
-}
-  const { error } = await supabase
-    .from("quote_requests")
-    .insert({
-      customer_id: user?.id ?? null,
-
-      name,
-      phone,
-      email,
-      property_type: propertyType,
-service,
-municipality,
-description,
-
-      request_type: requestType,
-
-      preferred_date:
-        requestType === "visit" && preferredDate
-          ? preferredDate
-          : null,
-
-      preferred_time_window:
-        requestType === "visit" && preferredTimeWindow
-          ? preferredTimeWindow
-          : null,
-
-      alternative_date:
-        requestType === "visit" && alternativeDate
-          ? alternativeDate
-          : null,
-
-      business_id: selectedBusiness?.id ?? null,
-
-      contractor_id: selectedBusiness
-        ? String(selectedBusiness.id)
-        : null,
-
-      contractor_name:
-  selectedBusiness?.business_name ?? null,
-
-photo_urls: photoUrls,
-
-status: "new",
-is_read: false,
-    });
-
-  if (error) {
-  console.error("Error al enviar solicitud:", error);
-  alert("No se pudo enviar la solicitud.");
-  setSubmitting(false);
-  return;
-}
-
-setSubmitting(false);
-setSubmitted(true);
 }
 
   return (
