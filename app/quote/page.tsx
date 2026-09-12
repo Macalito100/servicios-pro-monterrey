@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "next/navigation";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { supabase } from "@/lib/supabase";
 
 type SelectedBusiness = {
@@ -38,6 +39,14 @@ const [service, setService] = useState("");
 const [municipality, setMunicipality] = useState("");
 const [description, setDescription] = useState("");
 const [photos, setPhotos] = useState<File[]>([]);
+const [turnstileToken, setTurnstileToken] =
+  useState<string | null>(null);
+
+const [submitting, setSubmitting] =
+  useState(false);
+
+const turnstileSiteKey =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const [preferredDate, setPreferredDate] = useState("");
 const [preferredTimeWindow, setPreferredTimeWindow] = useState("");
@@ -120,6 +129,48 @@ async function handleSubmit(
   e: React.FormEvent<HTMLFormElement>
 ) {
   e.preventDefault();
+  if (!turnstileToken) {
+  alert(
+    "Completa la verificación de seguridad."
+  );
+  return;
+}
+
+setSubmitting(true);
+
+try {
+  const verificationResponse = await fetch(
+    "/api/turnstile/verify",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: turnstileToken,
+      }),
+    }
+  );
+
+  if (!verificationResponse.ok) {
+    alert(
+      "La verificación de seguridad falló. Actualiza la página e inténtalo nuevamente."
+    );
+    setSubmitting(false);
+    return;
+  }
+} catch (error) {
+  console.error(
+    "Error en la verificación de seguridad:",
+    error
+  );
+
+  alert(
+    "No se pudo completar la verificación de seguridad."
+  );
+  setSubmitting(false);
+  return;
+}
 
  const {
   data: { session },
@@ -204,12 +255,14 @@ is_read: false,
     });
 
   if (error) {
-    console.error("Error al enviar solicitud:", error);
-    alert("No se pudo enviar la solicitud.");
-    return;
-  }
+  console.error("Error al enviar solicitud:", error);
+  alert("No se pudo enviar la solicitud.");
+  setSubmitting(false);
+  return;
+}
 
-  setSubmitted(true);
+setSubmitting(false);
+setSubmitted(true);
 }
 
   return (
@@ -606,11 +659,38 @@ is_read: false,
   </div>
 )}
 
+{turnstileSiteKey ? (
+  <div className="flex justify-center">
+    <Turnstile
+      siteKey={turnstileSiteKey}
+      onSuccess={(token) =>
+        setTurnstileToken(token)
+      }
+      onExpire={() => setTurnstileToken(null)}
+      onError={() => setTurnstileToken(null)}
+      options={{
+        theme: "light",
+      }}
+    />
+  </div>
+) : (
+  <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
+    No se pudo cargar la verificación de seguridad.
+  </p>
+)}
+
 <button
   type="submit"
-  className="min-h-12 w-full rounded-xl bg-blue-700 px-4 py-3 font-bold text-white transition hover:bg-blue-800"
+  disabled={!turnstileToken || submitting}
+  className={`min-h-12 w-full rounded p-3 font-bold text-white transition ${
+    !turnstileToken || submitting
+      ? "cursor-not-allowed bg-blue-300"
+      : "bg-blue-700 hover:bg-blue-800"
+  }`}
 >
-  {requestType === "visit"
+  {submitting
+    ? "Enviando..."
+    : requestType === "visit"
     ? "Solicitar visita"
     : "Solicitar cotización"}
 </button>

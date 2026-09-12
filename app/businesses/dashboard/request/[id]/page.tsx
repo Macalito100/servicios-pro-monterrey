@@ -705,7 +705,7 @@ async function openConversation() {
         onClick={() => updateRequestStatus("in_progress")}
         className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700"
       >
-        🚧 Iniciar trabajo
+        🚧 Marcar como iniciado
       </button>
     </>
   )}
