@@ -47,26 +47,11 @@ business_id: number;
   is_read: boolean;
   status: string;
 };
-type Appointment = {
-  id: number;
-  created_at: string;
-  customer_name: string;
-  customer_phone: string;
-  customer_email: string;
-  appointment_date: string;
-  appointment_time: string;
-  property_type: string | null;
-  service: string;
-  address: string;
-  municipality: string;
-  notes: string | null;
-  status: string;
-};
+
 export default function BusinessDashboardPage() {
   const router = useRouter();
 
-  const [appointments, setAppointments] =
-  useState<Appointment[]>([]);
+  
   
   const [business, setBusiness] = useState<Business | null>(null);
  
@@ -330,28 +315,7 @@ const normalizedRequests = (quoteData ?? []).map(
 setRequests(normalizedRequests as QuoteRequest[]);
 }
 
-const {
-  data: appointmentData,
-  error: appointmentError,
-} = await supabase
-  .from("business_appointments")
-  .select(
-    "id, created_at, customer_name, customer_phone, customer_email, appointment_date, appointment_time, property_type, service, address, municipality, notes, status"
-  )
-  .eq("business_id", data.id)
-  .order("appointment_date", { ascending: true })
-  .order("appointment_time", { ascending: true });
 
-if (appointmentError) {
-  console.error(
-    "No se pudieron cargar las citas:",
-    appointmentError
-  );
-} else {
-  setAppointments(
-    (appointmentData ?? []) as Appointment[]
-  );
-}
 setLoading(false);
     }
 
@@ -391,38 +355,7 @@ return () => {
   supabase.removeChannel(quoteChannel);
 };
 }, [router]);
-async function updateAppointmentStatus(
-  id: number,
-  status: "confirmed" | "completed" | "rejected" | "cancelled"
-) {
-  const { data, error } = await supabase
-    .from("business_appointments")
-    .update({ status })
-    .eq("id", id)
-    .select("id, status")
-    .single();
 
-  if (error) {
-    console.error(
-      "No se pudo actualizar la cita:",
-      error
-    );
-
-    alert("No se pudo cambiar el estado de la cita.");
-    return;
-  }
-
-  setAppointments((current) =>
-    current.map((appointment) =>
-      appointment.id === id
-        ? {
-            ...appointment,
-            status: data.status,
-          }
-        : appointment
-    )
-  );
-}
 async function markRequestsAsRead() {
   if (!business) {
     return;
@@ -1312,186 +1245,7 @@ const responseRate =
     </div>
   </div>
 </section>
-<section className="mt-8">
-  <div className="flex items-center justify-between gap-4">
-    <h2 className="text-2xl font-bold">
-      Citas solicitadas
-    </h2>
 
-    <span className="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">
-      {appointments.length}
-    </span>
-  </div>
-
-  {appointments.length === 0 ? (
-    <div className="mt-5 rounded-xl bg-white p-6 shadow">
-      Todavía no has recibido solicitudes de cita.
-    </div>
-  ) : (
-    <div className="mt-5 space-y-5">
-      {appointments.map((appointment) => (
-        <article
-          key={appointment.id}
-          className="rounded-xl bg-white p-6 shadow"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h3 className="text-2xl font-bold">
-                {appointment.customer_name}
-              </h3>
-
-              <p className="mt-2 text-gray-700">
-                📅{" "}
-                {new Date(
-                  `${appointment.appointment_date}T00:00:00`
-                ).toLocaleDateString("es-MX", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
-
-              <p className="mt-1 text-gray-700">
-                🕒 {appointment.appointment_time.slice(0, 5)}
-              </p>
-            </div>
-
-            <span
-              className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                appointment.status === "confirmed"
-                  ? "bg-blue-100 text-blue-700"
-                  : appointment.status === "completed"
-                    ? "bg-green-100 text-green-700"
-                    : appointment.status === "rejected"
-                      ? "bg-red-100 text-red-700"
-                      : appointment.status === "cancelled"
-                        ? "bg-gray-200 text-gray-700"
-                        : "bg-yellow-100 text-yellow-700"
-              }`}
-            >
-              {appointment.status === "pending" && "Pendiente"}
-              {appointment.status === "confirmed" && "Confirmada"}
-              {appointment.status === "completed" && "Completada"}
-              {appointment.status === "rejected" && "Rechazada"}
-              {appointment.status === "cancelled" && "Cancelada"}
-            </span>
-          </div>
-
-          <div className="mt-5 space-y-1 text-gray-700">
-            <p>
-              <strong>Servicio:</strong> {appointment.service}
-            </p>
-
-            <p>
-              <strong>Propiedad:</strong>{" "}
-              {appointment.property_type || "No especificada"}
-            </p>
-
-            <p>
-              <strong>Teléfono:</strong>{" "}
-              {appointment.customer_phone}
-            </p>
-
-            <p>
-              <strong>Correo:</strong>{" "}
-              {appointment.customer_email}
-            </p>
-
-            <p>
-              <strong>Dirección:</strong>{" "}
-              {appointment.address}
-            </p>
-
-            <p>
-              <strong>Municipio:</strong>{" "}
-              {appointment.municipality}
-            </p>
-          </div>
-
-          {appointment.notes && (
-            <p className="mt-4 rounded-lg bg-gray-50 p-4 text-gray-700">
-              {appointment.notes}
-            </p>
-          )}
-
-          <div className="mt-5 flex flex-wrap gap-3">
-            <a
-              href={`tel:${appointment.customer_phone}`}
-              className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-            >
-              📞 Llamar
-            </a>
-
-            <a
-              href={`mailto:${appointment.customer_email}`}
-              className="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
-            >
-              ✉️ Correo
-            </a>
-
-
-            <button
-              type="button"
-              onClick={() =>
-                updateAppointmentStatus(
-                  appointment.id,
-                  "confirmed"
-                )
-              }
-              disabled={appointment.status === "confirmed"}
-              className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Confirmar
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updateAppointmentStatus(
-                  appointment.id,
-                  "completed"
-                )
-              }
-              disabled={appointment.status === "completed"}
-              className="rounded bg-green-700 px-4 py-2 text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Completar
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updateAppointmentStatus(
-                  appointment.id,
-                  "rejected"
-                )
-              }
-              disabled={appointment.status === "rejected"}
-              className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Rechazar
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                updateAppointmentStatus(
-                  appointment.id,
-                  "cancelled"
-                )
-              }
-              disabled={appointment.status === "cancelled"}
-              className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-          </div>
-        </article>
-      ))}
-    </div>
-  )}
-</section>
         <section id="solicitudes" className="mt-8 scroll-mt-24">
   <div className="flex items-center justify-between">
     <h2 className="text-2xl font-bold">
