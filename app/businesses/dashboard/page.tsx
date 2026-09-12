@@ -277,7 +277,7 @@ const { data: quoteData, error: quoteError } =
   await supabase
     .from("quote_requests")
     .select(
-      "id, created_at, customer_id, business_id, name, phone, email, property_type, service, description, photo_urls, status, is_read"
+      "id, created_at, customer_id, business_id, name, phone, email, property_type, service, description, photo_urls, request_type, preferred_date, preferred_time_window, alternative_date, status, is_read, responded_at"
     )
     .or(quoteFilter)
     .order("created_at", { ascending: false });
