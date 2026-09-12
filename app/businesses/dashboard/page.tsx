@@ -93,10 +93,12 @@ const [requestFilter, setRequestFilter] = useState<
   const [unreadMessages, setUnreadMessages] =
   useState(0);
 
-  const newRequests = requests.filter(
- 
-    (request) => request.status === "new"
-).length;
+  const isNewRequest = (request: QuoteRequest) =>
+  request.status === "new" ||
+  request.status === "pending";
+
+const newRequests =
+  requests.filter(isNewRequest).length;
 
 const unreadRequests = requests.filter(
   (request) => !request.is_read
@@ -104,8 +106,10 @@ const unreadRequests = requests.filter(
 
 const filteredRequests = requests.filter((request) => {
   const matchesStatus =
-    requestFilter === "all" ||
-    request.status === requestFilter;
+  requestFilter === "all" ||
+  (requestFilter === "new"
+    ? isNewRequest(request)
+    : request.status === requestFilter);
 
   const search = requestSearch.trim().toLowerCase();
 
@@ -712,7 +716,7 @@ const acceptanceRate =
     : 0;
 
 const respondedRequests = requests.filter(
-  (request) => request.status !== "new"
+  (request) => !isNewRequest(request)
 ).length;
 
 const responseRate =
@@ -1236,8 +1240,7 @@ const responseRate =
         : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
     }`}
   >
-    🟡 Nuevas (
-    {requests.filter((request) => request.status === "new").length})
+    🟡 Nuevas ({newRequests})
   </button>
 
   <button
