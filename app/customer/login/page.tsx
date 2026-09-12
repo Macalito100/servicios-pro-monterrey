@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { supabase } from "@/lib/supabase";
 
 export default function CustomerLoginPage() {
@@ -13,24 +14,43 @@ export default function CustomerLoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+const [turnstileToken, setTurnstileToken] =
+  useState<string | null>(null);
 
+const [turnstileKey, setTurnstileKey] =
+  useState(0);
+
+const turnstileSiteKey =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   async function handleLogin(
     event: React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
-    setLoading(true);
-    setMessage("");
+setMessage("");
+
+if (!turnstileToken) {
+  setMessage(
+    "Completa la verificación de seguridad."
+  );
+  return;
+}
+
+setLoading(true);
 
     const { data, error } =
       await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+  email,
+  password,
+  options: {
+    captchaToken: turnstileToken,
+  },
+});
 
     if (error) {
   console.error("Error al iniciar sesión:", error);
-
+setTurnstileToken(null);
+setTurnstileKey((current) => current + 1);
   if (error.message === "Email not confirmed") {
     setMessage(
       "Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada y la carpeta de spam."
@@ -47,15 +67,18 @@ export default function CustomerLoginPage() {
       data.user.user_metadata?.account_type;
 
     if (accountType !== "customer") {
-      await supabase.auth.signOut();
+  await supabase.auth.signOut();
 
-      setMessage(
-        "Esta cuenta no está registrada como cliente."
-      );
+  setTurnstileToken(null);
+  setTurnstileKey((current) => current + 1);
 
-      setLoading(false);
-      return;
-    }
+  setMessage(
+    "Esta cuenta no está registrada como cliente."
+  );
+
+  setLoading(false);
+  return;
+}
 
     router.push("/customer/dashboard");
     router.refresh();
@@ -124,7 +147,30 @@ export default function CustomerLoginPage() {
     </Link>
   </div>
 </div>
-
+{turnstileSiteKey ? (
+  <div className="flex justify-center">
+    <Turnstile
+      key={turnstileKey}
+      siteKey={turnstileSiteKey}
+      onSuccess={(token) =>
+        setTurnstileToken(token)
+      }
+      onExpire={() =>
+        setTurnstileToken(null)
+      }
+      onError={() =>
+        setTurnstileToken(null)
+      }
+      options={{
+        theme: "light",
+      }}
+    />
+  </div>
+) : (
+  <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
+    No se pudo cargar la verificación de seguridad.
+  </p>
+)}
           {message && (
             <div className="rounded bg-red-50 p-3 text-sm text-red-700">
               {message}
@@ -133,7 +179,11 @@ export default function CustomerLoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+  loading ||
+  !turnstileToken ||
+  !turnstileSiteKey
+}
             className="w-full rounded bg-blue-700 p-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Ingresando..." : "Iniciar sesión"}

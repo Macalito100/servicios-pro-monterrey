@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { supabase } from "@/lib/supabase";
 
 export default function ForgotPasswordPage() {
@@ -9,13 +10,27 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+const [turnstileToken, setTurnstileToken] =
+  useState<string | null>(null);
 
+const [turnstileKey, setTurnstileKey] =
+  useState(0);
+
+const turnstileSiteKey =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
-    setLoading(true);
+if (!turnstileToken) {
+  setMessage(
+    "Completa la verificación de seguridad."
+  );
+  return;
+}
+
+setLoading(true);
     setMessage("");
     setSuccess(false);
 
@@ -26,8 +41,9 @@ export default function ForgotPasswordPage() {
       await supabase.auth.resetPasswordForEmail(
         email,
         {
-          redirectTo,
-        }
+  redirectTo,
+  captchaToken: turnstileToken,
+}
       );
 
     setLoading(false);
@@ -37,7 +53,8 @@ export default function ForgotPasswordPage() {
         "Error al solicitar recuperación:",
         error
       );
-
+setTurnstileToken(null);
+setTurnstileKey((current) => current + 1);
       setMessage(
         "No se pudo enviar el correo. Inténtalo nuevamente."
       );
@@ -88,7 +105,30 @@ export default function ForgotPasswordPage() {
               placeholder="correo@email.com"
             />
           </div>
-
+{turnstileSiteKey ? (
+  <div className="flex justify-center">
+    <Turnstile
+      key={turnstileKey}
+      siteKey={turnstileSiteKey}
+      onSuccess={(token) =>
+        setTurnstileToken(token)
+      }
+      onExpire={() =>
+        setTurnstileToken(null)
+      }
+      onError={() =>
+        setTurnstileToken(null)
+      }
+      options={{
+        theme: "light",
+      }}
+    />
+  </div>
+) : (
+  <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
+    No se pudo cargar la verificación de seguridad.
+  </p>
+)}
           {message && (
             <div
               className={`rounded p-3 text-sm ${
@@ -103,7 +143,11 @@ export default function ForgotPasswordPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+  loading ||
+  !turnstileToken ||
+  !turnstileSiteKey
+}
             className="w-full rounded bg-blue-700 p-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading

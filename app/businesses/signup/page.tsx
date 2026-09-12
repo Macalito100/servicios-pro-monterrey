@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { supabase } from "@/lib/supabase";
 
 export default function BusinessSignupPage() {
@@ -14,7 +15,14 @@ export default function BusinessSignupPage() {
     useState("");
   const [submitting, setSubmitting] =
     useState(false);
+const [turnstileToken, setTurnstileToken] =
+  useState<string | null>(null);
 
+const [turnstileKey, setTurnstileKey] =
+  useState(0);
+
+const turnstileSiteKey =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
   ) {
@@ -28,21 +36,29 @@ export default function BusinessSignupPage() {
     }
 
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden.");
-      return;
-    }
+  alert("Las contraseñas no coinciden.");
+  return;
+}
 
-    setSubmitting(true);
+if (!turnstileToken) {
+  alert(
+    "Completa la verificación de seguridad."
+  );
+  return;
+}
+
+setSubmitting(true);
 
     const { data, error } =
       await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            account_type: "business",
-          },
-        },
+  captchaToken: turnstileToken,
+  data: {
+    account_type: "business",
+  },
+},
       });
 
     if (error) {
@@ -51,9 +67,12 @@ export default function BusinessSignupPage() {
         error
       );
 
-      alert(error.message);
-      setSubmitting(false);
-      return;
+      setTurnstileToken(null);
+setTurnstileKey((current) => current + 1);
+
+alert(error.message);
+setSubmitting(false);
+return;
     }
 
     /*
@@ -143,15 +162,44 @@ export default function BusinessSignupPage() {
     )}
 </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded bg-blue-700 p-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting
-              ? "Creando cuenta..."
-              : "Crear cuenta"}
-          </button>
+          {turnstileSiteKey ? (
+  <div className="flex justify-center">
+    <Turnstile
+      key={turnstileKey}
+      siteKey={turnstileSiteKey}
+      onSuccess={(token) =>
+        setTurnstileToken(token)
+      }
+      onExpire={() =>
+        setTurnstileToken(null)
+      }
+      onError={() =>
+        setTurnstileToken(null)
+      }
+      options={{
+        theme: "light",
+      }}
+    />
+  </div>
+) : (
+  <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
+    No se pudo cargar la verificación de seguridad.
+  </p>
+)}
+
+<button
+  type="submit"
+  disabled={
+    submitting ||
+    !turnstileToken ||
+    !turnstileSiteKey
+  }
+  className="w-full rounded bg-blue-700 p-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {submitting
+    ? "Creando cuenta..."
+    : "Crear cuenta"}
+</button>
         </form>
 
         <p className="mt-6 text-center text-gray-600">

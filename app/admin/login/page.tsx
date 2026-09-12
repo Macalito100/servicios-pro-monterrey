@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { supabase } from "@/lib/supabase";
 
 export default function AdminLoginPage() {
@@ -10,31 +11,56 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+const [turnstileToken, setTurnstileToken] =
+  useState<string | null>(null);
 
+const [turnstileKey, setTurnstileKey] =
+  useState(0);
+
+const turnstileSiteKey =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
-    setSubmitting(true);
+
+if (!turnstileToken) {
+  alert(
+    "Completa la verificación de seguridad."
+  );
+  return;
+}
+
+setSubmitting(true);
 
     const { data, error } =
   await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  email,
+  password,
+  options: {
+    captchaToken: turnstileToken,
+  },
+});
 
     setSubmitting(false);
 
     if (error) {
-      console.error("Error de inicio de sesión:", error);
-      alert("Correo o contraseña incorrectos.");
-      return;
-    }
+  console.error("Error de inicio de sesión:", error);
+
+  setTurnstileToken(null);
+  setTurnstileKey((current) => current + 1);
+
+  alert("Correo o contraseña incorrectos.");
+  return;
+}
     if (
   !data.user ||
   data.user.app_metadata?.role !== "admin"
 ) {
   await supabase.auth.signOut();
+
+  setTurnstileToken(null);
+  setTurnstileKey((current) => current + 1);
 
   alert(
     "Esta cuenta no tiene acceso administrativo."
@@ -79,10 +105,37 @@ export default function AdminLoginPage() {
             className="w-full rounded border p-3"
             required
           />
-
+{turnstileSiteKey ? (
+  <div className="flex justify-center">
+    <Turnstile
+      key={turnstileKey}
+      siteKey={turnstileSiteKey}
+      onSuccess={(token) =>
+        setTurnstileToken(token)
+      }
+      onExpire={() =>
+        setTurnstileToken(null)
+      }
+      onError={() =>
+        setTurnstileToken(null)
+      }
+      options={{
+        theme: "light",
+      }}
+    />
+  </div>
+) : (
+  <p className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
+    No se pudo cargar la verificación de seguridad.
+  </p>
+)}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={
+  submitting ||
+  !turnstileToken ||
+  !turnstileSiteKey
+}
             className="w-full rounded bg-blue-700 p-3 font-bold text-white hover:bg-blue-800 disabled:opacity-60"
           >
             {submitting ? "Ingresando..." : "Iniciar sesión"}
