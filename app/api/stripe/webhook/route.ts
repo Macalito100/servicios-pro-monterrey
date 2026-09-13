@@ -197,16 +197,20 @@ const paidPlan =
         customerId;
     }
 
-    const { error } = await supabaseAdmin
-      .from("business_registrations")
-      .update(updates)
-      .eq("id", businessId);
+    const { data: updatedBusiness, error } = await supabaseAdmin
+  .from("business_registrations")
+  .update(updates)
+  .eq("id", businessId)
+  .select("id")
+  .single();
 
-    if (error) {
-      throw new Error(
-        `No se pudo actualizar el negocio: ${error.message}`
-      );
-    }
+if (error || !updatedBusiness) {
+  throw new Error(
+    `No se pudo actualizar el negocio ${businessId}: ${
+      error?.message ?? "negocio no encontrado"
+    }`
+  );
+}
   }
 
   try {
