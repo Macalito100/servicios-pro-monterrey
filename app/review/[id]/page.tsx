@@ -86,14 +86,16 @@ export default function ReviewPage() {
         return;
       }
 
-      if (quoteData.status !== "completed") {
-        setErrorMessage(
-          "Solo puedes dejar una reseña cuando el trabajo esté completado."
-        );
-        setLoading(false);
-        return;
-      }
-
+      if (
+  quoteData.status !== "accepted" &&
+  quoteData.status !== "completed"
+) {
+  setErrorMessage(
+    "Solo puedes dejar una reseña después de seleccionar una empresa."
+  );
+  setLoading(false);
+  return;
+}
       setQuote(quoteData as QuoteRequest);
 
       const {
