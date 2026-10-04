@@ -33,6 +33,11 @@ export default function Providers() {
   );
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [quoteRequestId, setQuoteRequestId] =
+  useState<number | null>(null);
+
+const [selectingBusinessId, setSelectingBusinessId] =
+  useState<number | null>(null);
 
   useEffect(() => {
     async function loadProviders() {
@@ -56,7 +61,7 @@ export default function Providers() {
         setLoading(false);
         return;
       }
-
+setQuoteRequestId(Number(requestId));
       const { data, error } = await supabase.rpc(
         "get_interested_providers",
         {
@@ -85,7 +90,80 @@ export default function Providers() {
 
     loadProviders();
   }, [router]);
+async function selectProvider(provider: Provider) {
+  if (!quoteRequestId) {
+    alert("No se encontró la solicitud.");
+    return;
+  }
 
+  const confirmed = window.confirm(
+    `¿Deseas seleccionar a ${provider.business_name}?`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setSelectingBusinessId(provider.business_id);
+
+  const { data, error } = await supabase.rpc(
+    "select_quote_provider",
+    {
+      p_request_id: quoteRequestId,
+      p_business_id: provider.business_id,
+    }
+  );
+
+  if (error) {
+    console.error(
+      "Error al seleccionar la empresa:",
+      error
+    );
+
+    alert("No se pudo seleccionar la empresa.");
+    setSelectingBusinessId(null);
+    return;
+  }
+
+  const result = data as {
+    success?: boolean;
+    reason?: string;
+    conversation_id?: number;
+  };
+
+  if (!result?.success) {
+    if (result?.reason === "invalid_status") {
+      alert(
+        "Esta solicitud ya tiene una empresa seleccionada."
+      );
+    } else if (
+      result?.reason === "invalid_provider"
+    ) {
+      alert(
+        "Esta empresa ya no está disponible para la solicitud."
+      );
+    } else {
+      alert(
+        "No tienes permiso para seleccionar esta empresa."
+      );
+    }
+
+    setSelectingBusinessId(null);
+    return;
+  }
+
+  alert(
+    `${provider.business_name} fue seleccionada correctamente.`
+  );
+
+  if (result.conversation_id) {
+    router.push(
+      `/customer/messages/${result.conversation_id}`
+    );
+  } else {
+    router.push("/customer/dashboard");
+  }
+}
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-5xl px-5 py-10">
@@ -193,12 +271,25 @@ export default function Providers() {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/contractors/${provider.business_id}`}
-                    className="mt-6 inline-block rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"
-                  >
-                    Ver perfil
-                  </Link>
+                 <div className="mt-6 flex flex-wrap gap-3">
+  <Link
+    href={`/contractors/${provider.business_id}`}
+    className="inline-block rounded-lg border border-blue-700 px-5 py-3 font-semibold text-blue-700 hover:bg-blue-50"
+  >
+    Ver perfil
+  </Link>
+
+  <button
+    type="button"
+    onClick={() => selectProvider(provider)}
+    disabled={selectingBusinessId !== null}
+    className="rounded-lg bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    {selectingBusinessId === provider.business_id
+      ? "Seleccionando..."
+      : "Seleccionar empresa"}
+  </button>
+</div>
                 </article>
               ))}
             </div>
