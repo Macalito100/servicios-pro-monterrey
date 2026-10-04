@@ -459,7 +459,16 @@ async function openConversation(quoteRequestId: string) {
                         </p>
                       </div>
                     )}
-
+{quote.status === "new" && (
+  <div className="border-t border-gray-100 p-6">
+    <Link
+      href={`/quote/providers?request=${quote.id}`}
+      className="inline-block rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"
+    >
+      👷 Ver empresas interesadas
+    </Link>
+  </div>
+)}
                   {["accepted", "in_progress"].includes(
   quote.status ?? ""
 ) && (
