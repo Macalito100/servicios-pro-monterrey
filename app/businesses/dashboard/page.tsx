@@ -418,66 +418,62 @@ async function markRequestsAsRead() {
     router.push("/businesses/login");
     router.refresh();
   }
-async function updateRequestStatus(
-  id: number,
-  status:
-    | "new"
-    | "accepted"
-    | "in_progress"
-    | "completed"
-    | "rejected"
+async function rejectRequest(
+  request: QuoteRequest
 ) {
-  const updateData: {
-    status: string;
-    is_read: boolean;
-    responded_at?: string;
-  } = {
-    status,
-    is_read: true,
-  };
-
-  if (
-    status === "accepted" ||
-    status === "rejected"
-  ) {
-    updateData.responded_at =
-      new Date().toISOString();
-  }
-
-  const { data, error } = await supabase
-    .from("quote_requests")
-    .update(updateData)
-    .eq("id", id)
-    .select(
-      "id, status, is_read, responded_at"
-    )
-    .single();
+  const { data, error } = await supabase.rpc(
+    "reject_quote_request",
+    {
+      p_request_id: request.id,
+    }
+  );
 
   if (error) {
-  console.error(
-    "No se pudo actualizar la solicitud:",
-    error
-  );
+    console.error(
+      "No se pudo rechazar la solicitud:",
+      error
+    );
 
-  alert("No se pudo cambiar el estado.");
-  return false;
-}
+    alert(
+      "No se pudo rechazar la solicitud."
+    );
+    return;
+  }
+
+  const result = Array.isArray(data)
+    ? data[0]
+    : data;
+
+  if (!result?.success) {
+    if (
+      result?.reason === "not_authenticated"
+    ) {
+      alert(
+        "Tu sesión terminó. Inicia sesión nuevamente."
+      );
+      return;
+    }
+
+    alert(
+      "No tienes permiso para rechazar esta solicitud o ya fue respondida."
+    );
+    return;
+  }
 
   setRequests((current) =>
-    current.map((request) =>
-      request.id === id
+    current.map((item) =>
+      item.id === request.id
         ? {
-            ...request,
-            status: data.status,
-            is_read: data.is_read,
-            responded_at: data.responded_at,
+            ...item,
+            status: result.request_status,
+            is_read: result.request_is_read,
+            responded_at:
+              result.request_responded_at,
           }
-        : request
+        : item
     )
   );
-  return true;
 }
-
 async function acceptRequest(
   request: QuoteRequest
 ) {
@@ -1438,8 +1434,8 @@ const responseRate =
       <button
         type="button"
         onClick={() =>
-          updateRequestStatus(request.id, "rejected")
-        }
+  rejectRequest(request)
+}
         className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
       >
         ❌ Rechazar
