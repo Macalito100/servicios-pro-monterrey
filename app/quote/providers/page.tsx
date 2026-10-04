@@ -131,26 +131,32 @@ async function selectProvider(provider: Provider) {
     conversation_id?: number;
   };
 
-  if (!result?.success) {
-    if (result?.reason === "invalid_status") {
-      alert(
-        "Esta solicitud ya tiene una empresa seleccionada."
-      );
-    } else if (
-      result?.reason === "invalid_provider"
-    ) {
-      alert(
-        "Esta empresa ya no está disponible para la solicitud."
-      );
-    } else {
-      alert(
-        "No tienes permiso para seleccionar esta empresa."
-      );
-    }
-
-    setSelectingBusinessId(null);
-    return;
+ if (!result?.success) {
+  if (result?.reason === "provider_limit") {
+    alert(
+      "Esta empresa alcanzó el límite mensual de trabajos de su plan. Selecciona otra empresa."
+    );
+  } else if (
+    result?.reason === "invalid_status"
+  ) {
+    alert(
+      "Esta solicitud ya tiene una empresa seleccionada."
+    );
+  } else if (
+    result?.reason === "invalid_provider"
+  ) {
+    alert(
+      "Esta empresa ya no está disponible para la solicitud."
+    );
+  } else {
+    alert(
+      "No tienes permiso para seleccionar esta empresa."
+    );
   }
+
+  setSelectingBusinessId(null);
+  return;
+}
 
   alert(
     `${provider.business_name} fue seleccionada correctamente.`
