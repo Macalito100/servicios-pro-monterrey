@@ -699,41 +699,11 @@ async function openConversation() {
     : "💬 Abrir conversación"}
 </button>
 
-      <button
-        type="button"
-        disabled={saving}
-        onClick={() => updateRequestStatus("in_progress")}
-        className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700"
-      >
-        🚧 Marcar como iniciado
-      </button>
+      
     </>
   )}
 
-  {/* En progreso */}
-  {request.status === "in_progress" && (
-    <>
-      <button
-  type="button"
-  disabled={saving}
-  onClick={openConversation}
-  className="rounded-lg bg-purple-600 px-5 py-3 font-semibold text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
->
-  {saving
-    ? "Abriendo..."
-    : "💬 Abrir conversación"}
-</button>
-
-      <button
-        type="button"
-        disabled={saving}
-        onClick={() => updateRequestStatus("completed")}
-        className="rounded-lg bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
-      >
-        ✅ Marcar completada
-      </button>
-    </>
-  )}
+  
 
   {/* Completada */}
   {request.status === "completed" && (
