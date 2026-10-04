@@ -484,7 +484,7 @@ async function openConversation(quoteRequestId: string) {
     </button>
   </div>
 )}
-{quote.status === "completed" && (
+{quote.status === "accepted" && (
   <div className="border-t border-gray-100 p-6">
     {reviewedQuoteIds.includes(String(quote.id)) ? (
       <span className="inline-flex rounded-lg border border-green-200 bg-green-100 px-5 py-3 font-semibold text-green-800">
