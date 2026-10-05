@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones | Servicios Pro México",
+  title: "Términos y Condiciones",
   description:
     "Términos y condiciones de uso de Servicios Pro México.",
 };

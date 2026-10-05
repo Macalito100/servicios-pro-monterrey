@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Contacto | Servicios Pro México",
+  title: "Contacto",
   description:
     "Contacta al equipo de Servicios Pro México para recibir ayuda.",
 };

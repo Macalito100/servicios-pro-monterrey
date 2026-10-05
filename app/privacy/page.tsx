@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Aviso de Privacidad | Servicios Pro México",
+  title: "Aviso de Privacidad",
   description:
     "Aviso de privacidad de la plataforma Servicios Pro México.",
 };
